@@ -104,6 +104,10 @@
       titleCard(e.name, e.desc, 'era-' + e.theme);
       setTimeout(() => { const c = centerOf('#era-badge'); burst(c.x, c.y, 120); }, 200);
     });
+    IG.Bus.on('prestige', (d) => {
+      titleCard('The Long Night', 'Cities fall silent and the names are forgotten. You remember. +' + IG.fmtInt(d.gain) + ' points.', 'prestige');
+      setTimeout(() => { const c = centerOf('#pp-chip'); burst(c.x, c.y, 140, '#c8a8ff'); }, 600);
+    });
     IG.Bus.on('milestone', (d) => { const c = centerOf(d && d.sel ? d.sel : '#era-card'); burst(c.x, c.y, 60); });
     IG.Bus.on('achievement', () => { const c = centerOf('#toasts'); burst(c.x, c.y - 20, 50, '#ffd76a'); });
   }

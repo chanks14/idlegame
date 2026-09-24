@@ -295,3 +295,37 @@ table.stats { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 table.stats td, table.stats th { padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,.04); text-align: left; }
 table.stats th { color: var(--muted); font-weight: normal; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------- prestige + power tree */
+.pp-chip { cursor: pointer; }
+.pp-chip.ready { animation: pulse 1.8s infinite; }
+.prestige-panel { display: flex; align-items: center; gap: 24px; padding: 12px 16px; background: linear-gradient(90deg, rgba(120,90,200,.12), transparent);
+  border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 12px; flex-wrap: wrap; }
+.pp-big { font-family: var(--display); font-size: 34px; color: var(--gold); text-shadow: 0 0 16px rgba(255,211,106,.4); }
+.pp-mid { flex: 1; min-width: 240px; }
+.pp-gain { font-size: 15px; }
+b.gold, .gold { color: var(--gold); }
+.prestige-btn { font-family: var(--display); font-size: 16px; padding: 10px 18px; }
+.pt-wrap { display: flex; justify-content: center; }
+.pt-svg { width: min(100%, 900px); height: auto; max-height: calc(100vh - 215px); }
+.pt-ring { fill: none; stroke: var(--line); stroke-dasharray: 4 6; opacity: .6; }
+.pt-branch { font-family: var(--display); font-size: 22px; opacity: .9; }
+.pt-link { stroke-width: 2; opacity: .18; transition: opacity .4s; }
+.pt-link.lit { opacity: .8; filter: drop-shadow(0 0 4px currentColor); }
+.pt-core { filter: drop-shadow(0 0 22px var(--accent)); animation: corePulse 4s ease-in-out infinite; }
+@keyframes corePulse { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+.pt-core-text { font-family: var(--display); font-size: 15px; fill: #2a1a08; font-weight: bold; }
+.pt-node { cursor: pointer; }
+.pt-node .pt-halo { fill: none; stroke: var(--bc); stroke-width: 2; opacity: 0; transition: opacity .3s; }
+.pt-node .pt-disc { fill: var(--panel2); stroke: var(--bc); stroke-width: 2; transition: all .3s; }
+.pt-node .pt-lv { font-size: 15px; fill: var(--text); font-weight: 600; pointer-events: none; }
+.pt-node .pt-name { font-size: 15px; fill: var(--muted); pointer-events: none; }
+.pt-node.owned .pt-disc { fill: color-mix(in srgb, var(--bc) 35%, var(--panel)); filter: drop-shadow(0 0 8px var(--bc)); }
+.pt-node.owned .pt-name { fill: var(--text); }
+.pt-node.maxed .pt-halo { opacity: 1; stroke: var(--gold); }
+.pt-node.can .pt-halo { opacity: 1; animation: haloPulse 1.4s infinite; }
+@keyframes haloPulse { 0%,100% { stroke-opacity: .3; } 50% { stroke-opacity: 1; } }
+.pt-node.locked { opacity: .35; cursor: default; }
+.pt-node:hover .pt-disc { stroke-width: 3; }
+.transition.prestige { background: radial-gradient(circle, rgba(40,20,70,.7), rgba(0,0,0,.97)); }
+.transition.prestige .tc-title { color: #c8a8ff; text-shadow: 0 0 30px rgba(200,168,255,.6), 0 0 80px #6a3fd0; }

@@ -5,7 +5,7 @@
        formatting, dev mode, config). Stone Age playable.
 - [x] 2. Eras 2–7: generators, research, agents, buy multipliers, achievements, stats, event log, unlock
        teasers, era color themes.
-- [ ] 3. Prestige and the Immortal's Power Tree.
+- [x] 3. Prestige and the Immortal's Power Tree.
 - [ ] 4. Interstellar Age: planet types, habitability, cohorts, maturation, colony ships, galaxy canvas,
        20,000-world transition.
 - [ ] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
@@ -41,6 +41,18 @@
   tabs, mechanics, agent types, locked generators and the next era. Per-era CSS themes.
 - `tools/sim.js` first version (greedy active-player strategy; reports era times per run).
 
+### Phase 3 — Prestige + Power Tree
+- `js/systems/prestige.js`: legacy = Σ produced × resource legacy weight; points =
+  floor(k·(log10 legacy − offset)^power · ppMult) + era bonus. Available from the Classical Age.
+  Preview (gain, legacy, next point threshold) in the Power Tree tab and in the header chip (+N).
+- Confirmation dialog lists what is kept vs lost; "The Long Night" transition; saves immediately.
+- `js/systems/powertree.js`: 26 nodes in 9 branches (Dominion, Echoes of the First Fire, Retinue,
+  Inheritance, The Long Sleep, Seedworlds, Diaspora, Iron Will, Endurance). Late branches need era 7/8
+  reached once (`reqEra`). Special effects: starting resources, remembered research (`memory:N`),
+  Shamans from the start. Radial SVG tree UI with glowing links, tooltips (now → after), locked states.
+- New run bonuses are applied through `IG.Game.onNewRun` hooks.
+- 5 prestige/tree achievements. Sim now prestiges like a reasonable player (gain ≥ 2× lifetime, or stalled).
+
 ## Known issues
 - none yet
 
@@ -50,3 +62,6 @@
   steeper cost growth than effect growth.
 - Sim (no prestige, 4 clicks/s): Bronze 21m, Classical 46m, Medieval 1h03, Industrial 1h15, Atomic 1h55.
   Needs tuning in Phase 7 (target: Classical within 30–45 min).
+- After prestige, global multipliers compress era times ~linearly; run 2+ currently fly through eras.
+  Phase 7 must make base era times grow steeply with era index (bootstrap-generator cost growth, bigger
+  milestones) and keep tree multipliers moderate.

@@ -102,7 +102,9 @@
     }
     const e = IG.CONFIG.eras[s.run.era];
     setHTML(refs.eraBadge, IG.icons.html('era_' + e.id) + '<span>' + e.name + '</span>');
-    setText(refs.ppChip.querySelector('.amt'), IG.fmtInt(s.perm.pp));
+    const pend = IG.Prestige.canPrestige() ? IG.Prestige.gain() : 0;
+    setText(refs.ppChip.querySelector('.amt'), IG.fmtInt(s.perm.pp) + (pend > 0 ? '  (+' + IG.fmtInt(pend) + ')' : ''));
+    toggle(refs.ppChip, 'ready', pend > 0);
     toggle(refs.ppChip, 'hidden', s.perm.prestiges === 0 && s.perm.pp === 0 && !(IG.Prestige && IG.Prestige.unlocked()));
     if (document.body.dataset.era !== e.theme) document.body.dataset.era = e.theme;
   }
@@ -267,7 +269,9 @@
     refs.modalRoot = document.getElementById('modal-root');
     refs.toasts = document.getElementById('toasts');
     refs.ppChip.innerHTML = IG.icons.html('pp') + '<span class="amt">0</span>';
-    refs.ppChip._tip = () => '<b>Echoes of Memory</b><br>Prestige points to spend in the Power Tree.<br>Lifetime earned: ' + IG.fmtInt(IG.state.perm.ppTotal);
+    refs.ppChip._tip = () => '<b>Echoes of Memory</b><br>Prestige points to spend in the Power Tree.<br>Lifetime earned: ' + IG.fmtInt(IG.state.perm.ppTotal) +
+      (IG.Prestige.canPrestige() ? '<br>Prestige now for <b>+' + IG.fmtInt(IG.Prestige.gain()) + '</b>' : '') + '<br><span class="muted">Click to open the Power Tree.</span>';
+    refs.ppChip.addEventListener('click', () => switchTab('powertree'));
     document.getElementById('btn-save').addEventListener('click', () => { if (IG.Save.save()) toast('Game saved.'); });
     IG.Bus.on('log', onLog);
     IG.Bus.on('structure', () => { dirty = true; });

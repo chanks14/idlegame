@@ -24,6 +24,7 @@ const CPS = parseFloat(arg('cps', 4));
 const MAX_RUNS = parseInt(arg('runs', 30), 10);
 const VERBOSE = !!arg('verbose', false);
 const PRESTIGE = arg('prestige', 'auto');
+const STALL = parseFloat(arg('stall', 15)) * 60;   // minutes without a new era before a stalled prestige
 
 let clock = 1e12;
 const { IG, context } = load({ clock: () => clock });
@@ -112,15 +113,19 @@ function manage(res) {
 }
 
 // ------------------------------------------------------------------ prestige rule
-let bestRate = 0;
+// A reasonable player: prestige when the pending gain at least doubles their lifetime points, or when progress
+// has stalled (no new era for a while) and the gain is still meaningful.
+let lastEraAt = 0;
 function shouldPrestige() {
   if (PRESTIGE === 'none' || !IG.Prestige || !IG.Prestige.canPrestige()) return false;
+  const s = IG.state;
   const gain = IG.Prestige.gain();
-  const t = IG.state.run.time;
-  const rate = gain / t;
-  if (rate > bestRate) bestRate = rate;
-  // prestige once points-per-second has dropped well below its peak (and at least 10 minutes in)
-  return t > 600 && rate < bestRate * 0.8 && gain >= 1;
+  const total = s.perm.ppTotal;
+  const t = s.run.time;
+  if (t < 600) return false;
+  if (gain >= 2 * total + 10) return true;
+  const stalled = t - lastEraAt > STALL;
+  return stalled && gain >= Math.max(1, 0.5 * total);
 }
 
 // ------------------------------------------------------------------ run
@@ -140,6 +145,7 @@ while (t < end) {
   if (IG.Eras.canAdvance()) {
     IG.Eras.advance();
     cur.eras[s.run.era] = s.run.time;
+    lastEraAt = s.run.time;
     if (VERBOSE) console.log('  [' + IG.fmtTime(t) + '] run ' + (results.length + 1) + ' reached ' + C.eras[s.run.era].name + ' at ' + IG.fmtTime(s.run.time));
   }
   if (VERBOSE && t - lastLog >= 600) {
@@ -154,7 +160,7 @@ while (t < end) {
     IG.Prestige.doPrestige(true);
     if (IG.Sim && IG.Sim.spendPoints) IG.Sim.spendPoints();
     else if (IG.PowerTree) IG.PowerTree.autoSpend();
-    bestRate = 0;
+    lastEraAt = 0;
     cur = { eras: [0] };
     if (results.length >= MAX_RUNS) break;
   }

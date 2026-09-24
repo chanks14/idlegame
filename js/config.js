@@ -285,6 +285,7 @@
       'agent:administrator': 'Administrator agents', 'agent:navigator': 'Navigator agents', 'agent:admiral': 'Admiral agents',
       'mech:trade': 'Trade Routes', 'mech:rites': 'the Rites', 'mech:grid': 'the Power Grid', 'mech:compute': 'Compute Programs',
       'mech:mega': 'Megaprojects', 'rite:ascension': 'the Rite of Ascension',
+      'memory:0': 'Stone Age research at the start of every run', 'memory:1': 'Bronze Age research at the start of every run',
     },
 
     // Later-era resources multiply all earlier eras: mult = 1 + k * log10(1 + produced this run)
@@ -423,6 +424,96 @@
       },
     },
 
+    // ---------------------------------------------------------------- prestige ("The Long Night")
+    // points = floor(k × max(0, log10(legacy) − offset)^power × ppMult) + eraBonus[highest era this run]
+    // legacy = Σ produced this run × resources[r].legacy
+    prestige: {
+      minEra: 2,
+      k: 1,
+      offset: 8,
+      power: 1.5,
+      eraBonus: [0, 0, 5, 10, 20, 40, 80, 160, 320],
+    },
+
+    // ---------------------------------------------------------------- Immortal's Power Tree
+    // Radial layout: branch index sets the angle, depth the ring, lat a sideways offset (radians fraction).
+    // cost: [base, growth] in prestige points per level. req: {nodeId: minLevel}. reqEra: highest era ever reached.
+    powerTree: {
+      branches: [
+        { id: 'dominion', name: 'Dominion', color: '#ffcf5a' },
+        { id: 'echoes', name: 'Echoes of the First Fire', color: '#ff8a4c' },
+        { id: 'retinue', name: 'Retinue', color: '#7fd0ff' },
+        { id: 'inheritance', name: 'Inheritance', color: '#c7e07a' },
+        { id: 'sleep', name: 'The Long Sleep', color: '#b59cff' },
+        { id: 'seedworlds', name: 'Seedworlds', color: '#6fe0b0' },
+        { id: 'diaspora', name: 'Diaspora', color: '#8fb0ff' },
+        { id: 'ironwill', name: 'Iron Will', color: '#ff5d5d' },
+        { id: 'endurance', name: 'Endurance', color: '#e0a0a0' },
+      ],
+      nodes: {
+        // Dominion — production multipliers
+        dom1: { branch: 0, depth: 1, name: 'Voice in the Fire', maxLevel: 10, cost: [1, 2],
+          desc: 'Your whisper quickens every hand.', effects: [{ type: 'global', mult: 1.5 }] },
+        dom2: { branch: 0, depth: 2, name: 'Hand on the Scales', maxLevel: 10, cost: [25, 2.5], req: { dom1: 3 },
+          desc: 'Fortune favors what you favor.', effects: [{ type: 'global', mult: 2 }] },
+        dom3: { branch: 0, depth: 3, name: 'Eternal Dominion', maxLevel: 25, cost: [500, 3], req: { dom2: 3 }, reqEra: 7,
+          desc: 'Stars bend to an older will.', effects: [{ type: 'global', mult: 3 }] },
+        // Echoes of the First Fire — faster early eras
+        echo1: { branch: 1, depth: 1, name: 'Remembered Fire', maxLevel: 5, cost: [1, 2.2],
+          desc: 'The first ages come easier each time.', effects: [{ type: 'prod', era: [0, 1], mult: 2 }] },
+        echo2: { branch: 1, depth: 2, name: 'Remembered Roads', maxLevel: 5, cost: [6, 2.4], req: { echo1: 2 },
+          desc: 'Empires rise along familiar paths.', effects: [{ type: 'prod', era: [2, 3], mult: 2 }] },
+        echo3: { branch: 1, depth: 3, name: 'Remembered Engines', maxLevel: 5, cost: [40, 2.5], req: { echo2: 2 }, reqEra: 4,
+          desc: 'Industry is rediscovered, not invented.', effects: [{ type: 'prod', era: [4, 5, 6], mult: 2 }] },
+        echo_ms: { branch: 1, depth: 2, lat: 0.32, name: 'Swift Milestones', maxLevel: 3, cost: [10, 3.5], req: { echo1: 3 },
+          desc: 'Each age needs less to be born.', effects: [{ type: 'eraReq', mult: 0.7 }] },
+        echo_mem: { branch: 1, depth: 3, lat: 0.3, name: 'Deep Memory', maxLevel: 2, cost: [20, 5], req: { echo_ms: 1 },
+          desc: 'Level 1: every run starts with all Stone Age research. Level 2: Bronze Age research too.',
+          effects: [{ type: 'unlock', key: 'memory:0' }], levelEffects: { 2: [{ type: 'unlock', key: 'memory:1' }] } },
+        // Retinue — stronger and cheaper agents
+        ret1: { branch: 2, depth: 1, name: 'Loyal Retinue', maxLevel: 8, cost: [2, 2],
+          desc: 'Your servants work faster.', effects: [{ type: 'agentSpeed', mult: 1.25 }] },
+        ret_first: { branch: 2, depth: 2, lat: 0.3, name: 'First Disciple', maxLevel: 1, cost: [3, 1], req: { ret1: 1 },
+          desc: 'Shamans can be recruited from the first moment of every run.', effects: [{ type: 'unlock', key: 'agent:shaman' }] },
+        ret2: { branch: 2, depth: 2, name: 'Cheap Devotion', maxLevel: 5, cost: [4, 2.2], req: { ret1: 2 },
+          desc: 'Mortals serve you for less.', effects: [{ type: 'agentCost', mult: 0.6 }] },
+        ret3: { branch: 2, depth: 3, name: 'Remembered Names', maxLevel: 5, cost: [25, 3], req: { ret2: 2 },
+          desc: 'Each agent acts more times per turn.', effects: [{ type: 'agentPower', add: 1 }] },
+        // Inheritance — starting resources
+        inh1: { branch: 3, depth: 1, name: 'Buried Caches', maxLevel: 5, cost: [1, 2],
+          desc: 'Food and stone hidden for the next dawn.', effects: [{ type: 'startRes', res: 'food', amount: 2000 }, { type: 'startRes', res: 'stone', amount: 500 }] },
+        inh2: { branch: 3, depth: 2, name: 'Hidden Hoards', maxLevel: 5, cost: [8, 2.5], req: { inh1: 2 },
+          desc: 'Metal, scrolls and coin sealed in forgotten vaults.', effects: [{ type: 'startRes', res: 'bronze', amount: 500 }, { type: 'startRes', res: 'knowledge', amount: 200 }, { type: 'startRes', res: 'coin', amount: 50 }] },
+        inh3: { branch: 3, depth: 3, name: 'Relic Vaults', maxLevel: 5, cost: [40, 2.5], req: { inh2: 2 }, reqEra: 4,
+          desc: 'Faith and energy stored against the dark.', effects: [{ type: 'startRes', res: 'faith', amount: 2000 }, { type: 'startRes', res: 'energy', amount: 1000 }] },
+        // The Long Sleep — offline cap
+        sleep1: { branch: 4, depth: 1, name: 'The Long Sleep', maxLevel: 4, cost: [2, 2],
+          desc: 'You may slumber longer and still the world turns.', effects: [{ type: 'offlineCap', add: 12 }] },
+        sleep2: { branch: 4, depth: 2, name: 'Dreaming Hand', maxLevel: 3, cost: [20, 3], req: { sleep1: 2 },
+          desc: 'Your dreams keep the world in order.', effects: [{ type: 'offlineCap', add: 24 }] },
+        // Seedworlds — faster world maturation (late)
+        seed1: { branch: 5, depth: 1, name: 'Seedworlds', maxLevel: 5, cost: [50, 2], reqEra: 7,
+          desc: 'New colonies bloom faster.', effects: [{ type: 'maturation', mult: 1.5 }] },
+        seed2: { branch: 5, depth: 2, name: 'Gardeners of Worlds', maxLevel: 5, cost: [150, 2.2], req: { seed1: 2 }, reqEra: 7,
+          desc: 'Every world is a little kinder to life.', effects: [{ type: 'hab', add: 0.05 }] },
+        // Diaspora — colonization yield (late)
+        dia1: { branch: 6, depth: 1, name: 'Diaspora', maxLevel: 5, cost: [60, 2.2], reqEra: 7,
+          desc: 'Each ark carries enough to seed another world.', effects: [{ type: 'colonyYield', add: 1 }] },
+        dia2: { branch: 6, depth: 2, name: 'Swift Arks', maxLevel: 5, cost: [150, 2.3], req: { dia1: 2 }, reqEra: 7,
+          desc: 'Faster, cheaper ships.', effects: [{ type: 'shipSpeed', mult: 1.5 }, { type: 'shipCost', mult: 0.8 }] },
+        // Iron Will — fleet strength (late)
+        iron1: { branch: 7, depth: 1, name: 'Iron Will', maxLevel: 10, cost: [200, 2], reqEra: 8,
+          desc: 'Your fleets do not break.', effects: [{ type: 'fleetPower', mult: 2 }] },
+        iron2: { branch: 7, depth: 2, name: 'Unbroken Legions', maxLevel: 5, cost: [500, 2.5], req: { iron1: 3 }, reqEra: 8,
+          desc: 'Soldiers who remember a thousand wars.', effects: [{ type: 'unitPower', unit: 'legion', mult: 3 }] },
+        // Endurance — attrition reduction (late)
+        end1: { branch: 8, depth: 1, name: 'Endurance', maxLevel: 6, cost: [200, 2], reqEra: 8,
+          desc: 'Fewer ships lost to the grind of war.', effects: [{ type: 'attrition', mult: 0.85 }] },
+        end2: { branch: 8, depth: 2, name: 'Last Stand', maxLevel: 4, cost: [400, 2.5], req: { end1: 2 }, reqEra: 8,
+          desc: 'Worlds cling on when fronts collapse.', effects: [{ type: 'lossMult', mult: 0.7 }] },
+      },
+    },
+
     // ---------------------------------------------------------------- achievements
     // cond types: res (produced this run), era, gen, totalGens, upgrades, research, agents, agentLevel, clicks,
     //   tradeLevels, rites, gridLevel, computeAll, mega, megaAll, prestiges, nodes, ppSpent, worlds, ships, fronts,
@@ -474,6 +565,11 @@
         { id: 'machine_mind', name: 'Machine Mind', desc: 'Run all three compute programs at once.', cond: { type: 'computeAll' } },
         { id: 'megastructure', name: 'Megastructure', desc: 'Complete a megaproject.', cond: { type: 'mega', count: 1 } },
         { id: 'wonders', name: 'Wonders of the Cradle', desc: 'Complete every megaproject in one run.', cond: { type: 'megaAll' } },
+        { id: 'long_night', name: 'The Long Night', desc: 'Prestige for the first time.', cond: { type: 'prestiges', count: 1 } },
+        { id: 'cycles', name: 'Cycles', desc: 'Prestige 5 times.', cond: { type: 'prestiges', count: 5 } },
+        { id: 'eternal_return', name: 'Eternal Return', desc: 'Prestige 25 times.', cond: { type: 'prestiges', count: 25 } },
+        { id: 'awakened', name: 'Awakened', desc: 'Own 5 Power Tree levels.', cond: { type: 'nodes', count: 5 } },
+        { id: 'ascendant', name: 'Ascendant', desc: 'Spend 1,000 prestige points in total.', cond: { type: 'ppSpent', count: 1000 } },
         { id: 'patient', name: 'Patient', desc: 'Play for 1 hour.', cond: { type: 'playtime', sec: 3600 } },
         { id: 'devoted', name: 'Devoted', desc: 'Play for 24 hours.', cond: { type: 'playtime', sec: 86400 } },
       ],
