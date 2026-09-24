@@ -50,7 +50,7 @@
     IG.UI.modal({
       title: 'Embrace the Long Night?',
       body: '<p>Civilization will collapse into a dark age and begin again in the <b>Stone Age</b>.</p>' +
-        '<p>You will gain <b class="gold">' + IG.fmtInt(g) + '</b> prestige points (' + IG.fmtInt(P.gain() - P.eraBonus()) + ' from legacy + ' + P.eraBonus() + ' for reaching the ' + IG.CONFIG.eras[s.run.era].name + ').</p>' +
+        '<p>You will gain <b class="gold">' + IG.fmtInt(g) + '</b> prestige points (' + IG.fmtInt(P.gain() - P.eraBonus()) + ' from legacy + ' + P.eraBonus() + ' for reaching the ' + IG.CONFIG.eras[s.run.era].name + (s.run.war ? ' and winning ' + s.run.war.won + ' fronts' : '') + ').</p>' +
         '<p class="muted">Kept: Power Tree, prestige points, achievements, statistics, settings.<br>Lost: resources, generators, research, agents, worlds, fleets.</p>',
       buttons: [{ text: 'Not yet' }, { text: 'Let it fall', cls: 'danger', onClick: go }],
     });

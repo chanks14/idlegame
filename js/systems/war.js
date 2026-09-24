@@ -16,7 +16,8 @@
   function emax(f) {
     const w = W();
     const growth = trait(f.faction, 'growth', 1);
-    return D(w.baseEnemy * trait(f.faction, 'strength', 1))
+    const base = st().scale ? D(st().scale) : D(w.baseEnemy);
+    return base.mul(trait(f.faction, 'strength', 1))
       .mul(D(w.depthGrowth).pow(f.depth))
       .mul(D(w.timeGrowthPerMin).pow(minutesAtWar() * growth))
       .mul(IG.Mods.get().enemyStrength);
@@ -33,8 +34,10 @@
   }
 
   function init() {
+    const sm = (IG.Prod.cache.gross && IG.Prod.cache.gross.starmatter) || D(0);
     const e = { start: IG.state.run.time, fronts: [], won: 0, lost: 0, seq: 0, lossRate: D(0),
-      core: Math.floor(IG.Expansion.totalWorlds() * W().coreFloor) };
+      core: Math.floor(IG.Expansion.totalWorlds() * W().coreFloor),
+      scale: Decimal.max(D(W().baseEnemy), sm.mul(W().enemyScale)) };
     IG.state.run.war = e;
     for (const fid in W().factions) {
       for (let k = 0; k < faction(fid).fronts; k++) e.fronts.push(newFront(fid, 0));
@@ -99,7 +102,7 @@
   function win(f, idx) {
     const s = IG.state, e = st();
     const n = captureSize(f);
-    IG.Expansion.claim(n, s.run.time);
+    IG.Expansion.claim(n, s.run.time, { captured: true });
     e.won++;
     s.perm.stats.frontsWon++;
     IG.Log.add('Victory at ' + f.name + ' against the ' + faction(f.faction).name + '. ' + IG.fmtInt(n) + ' worlds taken. A deeper front opens.', 'war');

@@ -23,7 +23,11 @@
     return P().k * Math.pow(x, P().power);
   }
 
-  function eraBonus() { return P().eraBonus[IG.state.run.era] || 0; }
+  function eraBonus() {
+    const s = IG.state;
+    const fronts = s.run.war ? s.run.war.won * (P().frontBonus || 0) : 0;
+    return (P().eraBonus[s.run.era] || 0) + fronts;
+  }
 
   function gain() {
     if (IG.state.run.era < P().minEra) return 0;

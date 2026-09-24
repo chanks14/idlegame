@@ -11,7 +11,7 @@
 - [x] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
        military tech.
 - [x] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
-- [ ] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
+- [x] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
 
 ## Log
 ### Phase 1 — core engine + Stone Age
@@ -97,18 +97,50 @@
   volume slider + mute in Settings. Audio unlocks on first user gesture.
 - Galaxy capacity (1e12 worlds) tapers claims only near the cap, keeping world counts finite.
 
+### Phase 7 — Balancing and bug fixes
+- `tools/sim.js` grew into a tuning harness: `--prestige auto|none`, `--cps`, `--manage` (seconds between
+  decisions), `--reserve`, `--stall`, `--mult` (flat production multiplier), `--set path=value` (config
+  override, repeatable), `--warlog`, `--snapshot file` (state at first contact), `--from file`.
+- `tools/uitest.js`: Playwright smoke test through every era and tab (tooltips, buttons, prestige,
+  export/import, offline). Found and fixed a Research-tab crash in eras 7–8 (describe.js config paths).
+- Structural fixes found by simulation:
+  - Trade routes multiplicative → additive (runaway coin loop).
+  - Interstellar/war repeatable techs had cheap geometric costs vs. strong effects → super-exponential
+    blow-ups; now Σ ln(effect)/ln(cost growth) ≈ 0.35 and lower caps.
+  - Colonization is bounded by `freeSpace` (60k) + space opened by conquest (2× captured worlds); growth
+    after first contact comes from winning fronts. "Launch max" and agents only launch useful arks.
+  - Enemy base strength scales with Starmatter/s at first contact (fair start for any economy); slower time
+    escalation (1.02/min); prestige bonus per front won (8 points).
+  - Bootstrap generators of each era cost older resources with steep growth (1.3).
+  - Power tree softened (×1.25 / ×1.5 per level) so prestige compresses runs gradually.
+  - Saves store Decimals exactly as [mantissa, exponent] (SAVE_VERSION 2 + migration).
+  - Suffix notation falls back to scientific beyond 1e303.
+- Performance (browser, 5M worlds, 1e450 values): tick 0.13–0.57 ms, UI refresh < 1 ms; 24 h offline ≈ 0.4 s.
+
 ## Known issues
-- none yet
+- Pacing numbers come from an idealized simulated player; expect a human to be ~1.2–1.6× slower.
+- The endless war is designed to stall eventually (enemy escalation is exponential in time); the intended
+  answer is to prestige. Very long single war runs (> 3–4 h) are not finely tuned.
+- Front lines on the galaxy view are arcs around the homeworld per faction sector — a stylized
+  representation, not a simulation of territory.
+- Audio starts only after the first click/keypress (browser autoplay policy).
+- Offline simulation uses steps of up to 60 s: exact for production, approximate for war/agents.
+- No save downgrade: a save exported from a newer version cannot be imported into an older build.
+- Mobile layout is functional but not optimized.
 
 ## Balance notes
+- Final pacing (`node tools/sim.js --hours 8 --dt 3 --manage 3`, idealized active player, 4 clicks/s):
+  Classical (first prestige) run 1 at 26 m · Medieval run 2 · Industrial run 3 · Atomic run 4 ·
+  Spacefaring run 5 · Interstellar run 6 at 3 h 07 m total · Galactic War run 7 at 4 h 10 m.
+- Casual profile (`--cps 2 --manage 10`): Classical 27 m, Interstellar run 6 (3 h 10 m), War run 7 (4 h 28 m).
+- Check-in profile (`--cps 1 --manage 120`, agents do most work): Classical 40 m, Interstellar run 7
+  (5 h 22 m), War run 8 (6 h 46 m).
+- War arc (from a first-contact snapshot): fast conquest for ~20 min, contested fronts for ~2–2.5 h
+  (~75–140 fronts won, worlds 60k → ~4M), then escalation wins and the player prestiges.
+- Levers: era milestone amounts (per-era length), bootstrap generator cost growth, power tree effect/cost
+  ratios (how much each prestige compresses a run), `prestige.offset/power/eraBonus/frontBonus`,
+  `expansion.shipCost/matureSeconds/travelSeconds/freeSpace`, `war.enemyScale/timeGrowthPerMin/depthGrowth`.
+- Rule of thumb: any level-based effect needs cost growth much steeper than effect growth, or it must be
+  additive — otherwise the resource that pays for it runs away.
 - Trade routes were originally multiplicative per level and caused a runaway coin→routes loop (1e270 in
-  minutes). Now additive: 1 + 0.5 × tradeMult × level. Keep level-based effects additive or give them
-  steeper cost growth than effect growth.
-- Sim (no prestige, 4 clicks/s): Bronze 21m, Classical 46m, Medieval 1h03, Industrial 1h15, Atomic 1h55.
-  Needs tuning in Phase 7 (target: Classical within 30–45 min).
-- After prestige, global multipliers compress era times ~linearly; run 2+ currently fly through eras.
-  Phase 7 must make base era times grow steeply with era index (bootstrap-generator cost growth, bigger
-  milestones) and keep tree multipliers moderate.
-- Interstellar: repeatable multiplicative techs with cheap geometric costs made growth super-exponential
-  (20k worlds in 15 min). Keep Σ ln(effect)/ln(costGrowth) over repeatables well below 1. With a strong
-  dev-jump economy the probe now reaches 20k worlds in ~45 min; verify with natural runs in Phase 7.
+  minutes). Now additive: 1 + 0.5 × tradeMult × level.

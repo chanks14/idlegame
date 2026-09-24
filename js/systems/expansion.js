@@ -65,6 +65,7 @@
       if (isColony(t)) tot.colonies += cs[t].total; else tot.outposts += cs[t].total;
     }
     cachedTotals = tot;
+    if (active()) st().pending = 0;
     return tot;
   }
   function totalWorlds() { return active() ? cachedTotals.total : 0; }
@@ -72,12 +73,25 @@
 
   // ---------------------------------------------------------------- claiming / losing
   // Split `count` worlds across planet types by weight, deterministically (fractional carry per type).
-  function claim(count, time) {
+  // Colonization room: the uncontested region plus space opened by conquest.
+  function capacity() {
+    const e = st();
+    return X().freeSpace + (e ? (e.captured || 0) * X().captureOpensSpace : 0);
+  }
+
+  // Claim worlds. Colonization (default) tapers as the empire fills its available space; captured worlds
+  // (opts.captured) are taken from the enemy and always land.
+  function claim(count, time, opts) {
     if (!active() || count <= 0) return 0;
-    const room = Math.max(0, 1 - cachedTotals.total / X().capacity);
-    count = count * room;
-    if (count <= 0) return 0;
     const e = st(), P = X().planets;
+    if (opts && opts.captured) {
+      e.captured = (e.captured || 0) + count;
+    } else {
+      const cap = capacity(), total = cachedTotals.total + (e.pending || 0);
+      const room = Math.max(0, 1 - total / cap);
+      count = Math.min(count * room, Math.max(0, cap - total));
+      if (count < 1e-9) return 0;
+    }
     let W = 0;
     for (const t in P) W += P[t].weight;
     const bucket = Math.floor(time / X().bucketSeconds) * X().bucketSeconds;
@@ -95,6 +109,7 @@
       if (c) c.n += whole; else e.cohorts.push({ type: t, t: bucket, n: whole });
     }
     e.worldsClaimed += added;
+    e.pending = (e.pending || 0) + added;   // counted until the next recount
     return added;
   }
 
@@ -138,10 +153,16 @@
     return Math.max(0, Math.min(best, 1e12));
   }
   function inFlight() { return active() ? st().flights.reduce((a, f) => a + f.n, 0) : 0; }
+  // Arks worth launching: enough to fill the remaining colonizable space (counting arks already in flight).
+  function usefulShips() {
+    if (!active()) return 0;
+    const room = capacity() - cachedTotals.total - inFlight() * yieldPerShip();
+    return room <= 0 ? 0 : Math.ceil(room / yieldPerShip());
+  }
 
   function buildShips(mode, silent) {
     if (!active()) return 0;
-    let n = mode === 'max' ? maxShips() : (parseInt(mode, 10) || 1);
+    let n = mode === 'max' ? Math.min(maxShips(), usefulShips()) : (parseInt(mode, 10) || 1);
     if (n <= 0) return 0;
     const c = shipCost(n);
     if (!IG.Prod.canAfford(c)) return 0;
@@ -221,8 +242,8 @@
   IG.Save.onHydrate.push(function () { cachedTotals = { total: 0, effective: 0, colonies: 0, outposts: 0, maturing: 0 }; });
 
   const Expansion = {
-    active, init, types, habitability, isColony, outputFactor, perWorld, maturity, census, recount,
-    totalWorlds, effectiveWorlds, claim, lose, shipCost, travelTime, yieldPerShip, maxShips, inFlight, buildShips,
+    active, init, capacity, types, habitability, isColony, outputFactor, perWorld, maturity, census, recount,
+    totalWorlds, effectiveWorlds, claim, lose, shipCost, travelTime, yieldPerShip, maxShips, inFlight, usefulShips, buildShips,
     totals() { return cachedTotals; },
     onTick: [],
     lastOutput: D(0),

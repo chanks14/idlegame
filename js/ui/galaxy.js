@@ -88,9 +88,11 @@
     setText(refs.stats.flight, IG.fmtInt(E.inFlight()) + (fl.length ? '  · next in ' + Math.ceil(fl[0].arrive - IG.state.run.time) + 's' : ''));
     setHTML(refs.shipInfo, 'Travel time <b>' + E.travelTime().toFixed(0) + 's</b> · <b>' + E.yieldPerShip() + '</b> world(s) per ark · maturation ' +
       IG.fmtTime(X.matureSeconds / IG.Mods.get().maturation) + ' · launched ' + IG.fmtInt(IG.state.run.exp.shipsLaunched));
-    setHTML(refs.shipCost, 'Cost per ark: ' + IG.dom.costHTML(E.shipCost(1)) + ' · affordable: ' + IG.fmtInt(E.maxShips()));
+    const cap = E.capacity(), fill = tot.total / cap;
+    setHTML(refs.shipCost, 'Cost per ark: ' + IG.dom.costHTML(E.shipCost(1)) + ' · affordable: ' + IG.fmtInt(E.maxShips()) +
+      '<br>Colonizable space: ' + IG.fmtInt(tot.total) + ' / ' + IG.fmtInt(cap) + (fill > 0.5 ? ' <span class="' + (fill > 0.9 ? 'no' : 'muted') + '">— arks find fewer free worlds as space fills' + (IG.War.active() ? '; conquest opens more' : '') + '</span>' : ''));
     const max = E.maxShips();
-    for (const sb of refs.shipBtns) toggle(sb.b, 'disabled', sb.m === 'max' ? max < 1 : max < parseInt(sb.m, 10));
+    for (const sb of refs.shipBtns) toggle(sb.b, 'disabled', sb.m === 'max' ? Math.min(max, E.usefulShips()) < 1 : max < parseInt(sb.m, 10));
     const cs = E.census();
     for (const t in refs.planets) {
       const r = refs.planets[t];

@@ -49,8 +49,8 @@
       case 'clickRate': return { label: 'Each forage also yields', value: '+' + (Math.round(e.add * lv * 100) / 100) + 's of production' };
       case 'unlock': return { label: 'Unlocks ' + unlockName(e.key), value: lv > 0 ? '✓' : '—' };
       case 'startRes': return { label: 'Start each run with ' + C.resources[e.res].name, value: IG.fmt(e.amount * lv) };
-      case 'hab': return { label: 'Habitability' + (e.planet ? ' of ' + C.planets[e.planet].name + ' worlds' : ' of all worlds'), value: '+' + (e.add * lv).toFixed(2) };
-      case 'counter': return { label: 'Fleet power vs ' + C.factions[e.faction].name, value: IG.fmtMult(Math.pow(e.mult, lv)) };
+      case 'hab': return { label: 'Habitability' + (e.planet ? ' of ' + C.expansion.planets[e.planet].name + ' worlds' : ' of all worlds'), value: '+' + (e.add * lv).toFixed(2) };
+      case 'counter': return { label: 'Fleet power vs ' + C.war.factions[e.faction].name, value: IG.fmtMult(Math.pow(e.mult, lv)) };
       case 'unitPower': return { label: (e.unit === 'warship' ? 'Warship' : 'Legion') + ' power', value: IG.fmtMult(IG.D(e.mult).pow(lv)) };
       default: {
         const label = LABELS[e.type] || e.type;

@@ -42,9 +42,16 @@ tools/sim.js            headless pacing simulator (node tools/sim.js --help)
 assets/                 optional file overrides for icons (see assets/README.md)
 ```
 
+## Tools
+- `node tools/check.js` — syntax check of every script + headless smoke test + save round-trip + offline cap.
+- `node tools/sim.js [flags]` — pacing simulator (see header comment and PROGRESS.md for flags such as
+  `--prestige none`, `--mult 10`, `--set eras.2.milestone.0.amount=1e6`, `--snapshot/--from`, `--warlog`).
+- `node tools/uitest.js` — Playwright browser smoke test through all eras/tabs (needs Chromium).
+
 ## Workflow rules
 - One feature at a time; keep the game playable after each change (open index.html, no console errors).
-- Run `node tools/sim.js` after balance changes and note results in PROGRESS.md.
+- Run `node tools/sim.js` after balance changes and note results in PROGRESS.md. Keep level-based effects
+  additive, or give them cost growth much steeper than their effect (see Balance notes in PROGRESS.md).
 - Run `node tools/check.js` (syntax + headless smoke test) before committing.
 - At the end of each session: update `PROGRESS.md` (built, known issues, balance notes) and commit with a
   clear message.

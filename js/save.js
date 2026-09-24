@@ -4,12 +4,17 @@
   const IG = globalThis.IG || (globalThis.IG = {});
 
   // Bump whenever the save format changes, and add a migration from the previous version below.
-  const SAVE_VERSION = 1;
+  const SAVE_VERSION = 2;
   const KEY = 'undyingHand.save';
 
   // migrations[v] upgrades a raw save object from version v to v+1.
   const migrations = {
-    // 1: (raw) => { ...; return raw; },
+    // v1 → v2: Decimals are now stored exactly as [mantissa, exponent] (deserialize() still reads the old
+    // string form, so no data change is needed); war state gained `scale`, expansion gained `captured`.
+    1: (raw) => {
+      if (raw.run && raw.run.exp && raw.run.exp.captured === undefined) raw.run.exp.captured = 0;
+      return raw;
+    },
   };
 
   function migrate(raw) {
@@ -23,11 +28,11 @@
     return raw;
   }
 
-  // JSON with Decimal markers: {"$d": "1.5e400"}
+  // JSON with exact Decimal markers: {"$d": [mantissa, exponent]} (older saves used {"$d": "1.5e400"})
   function serialize(state) {
     return JSON.stringify(state, function (key, value) {
       const orig = this[key];
-      if (orig instanceof Decimal) return { $d: orig.toString() };
+      if (orig instanceof Decimal) return { $d: [orig.mantissa, orig.exponent] };
       return value;
     });
   }
@@ -35,7 +40,8 @@
   function deserialize(str) {
     return JSON.parse(str, function (key, value) {
       if (value && typeof value === 'object' && value.$d !== undefined && Object.keys(value).length === 1) {
-        return new Decimal(value.$d);
+        const d = value.$d;
+        return Array.isArray(d) ? Decimal.fromMantissaExponent(d[0], d[1]) : new Decimal(d);
       }
       return value;
     });

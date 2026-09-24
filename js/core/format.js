@@ -13,7 +13,7 @@
   function suffixFor(n) {
     if (n < BASIC.length) return BASIC[n];
     const i = n - 1; // i >= 10
-    if (i >= 1000) return null;
+    if (i > 100) return null; // beyond centillion (1e303) suffixes stop being readable → scientific
     return UNITS[i % 10] + TENS[Math.floor(i / 10) % 10] + HUNDREDS[Math.floor(i / 100)];
   }
 

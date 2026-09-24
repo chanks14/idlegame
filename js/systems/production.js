@@ -22,25 +22,29 @@
     return out;
   }
 
+  // Decimal forms of a generator's cost growth factors, cached on the config object (hot path).
+  function growthD(g) {
+    if (!g._growthD) { g._growthD = {}; for (const r in g.cost) g._growthD[r] = D(g.cost[r][1]); }
+    return g._growthD;
+  }
+
   // Cost to buy `n` units starting from the current count: {res: Decimal}
   function costFor(id, n) {
     const g = cfg(id), owned = st(id).n;
     const cm = IG.Mods.get().cost[id] || 1;
+    const gd = growthD(g);
     const out = {};
-    for (const r in g.cost) {
-      const [base, growth] = g.cost[r];
-      out[r] = Decimal.sumGeometricSeries(n, D(base * cm), D(growth), owned);
-    }
+    for (const r in g.cost) out[r] = Decimal.sumGeometricSeries(n, D(g.cost[r][0] * cm), gd[r], owned);
     return out;
   }
 
   function maxAfford(id) {
     const g = cfg(id), owned = st(id).n, res = IG.state.run.resources;
     const cm = IG.Mods.get().cost[id] || 1;
+    const gd = growthD(g);
     let best = Infinity;
     for (const r in g.cost) {
-      const [base, growth] = g.cost[r];
-      const n = Decimal.affordGeometricSeries(res[r], D(base * cm), D(growth), owned).toNumber();
+      const n = Decimal.affordGeometricSeries(res[r], D(g.cost[r][0] * cm), gd[r], owned).toNumber();
       if (n < best) best = n;
     }
     return Math.max(0, Math.floor(best));
@@ -93,10 +97,8 @@
     const g = cfg(id);
     const cm = IG.Mods.get().cost[id] || 1;
     const cost = {};
-    for (const r in g.cost) {
-      const [base, growth] = g.cost[r];
-      cost[r] = D(base * cm).mul(D(growth).pow(threshold)).mul(U.costFactor);
-    }
+    const gd = growthD(g);
+    for (const r in g.cost) cost[r] = D(g.cost[r][0] * cm * U.costFactor).mul(gd[r].pow(threshold));
     return {
       threshold,
       ready: s.n >= threshold,

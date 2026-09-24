@@ -46,10 +46,10 @@
     eras: [
       { id: 'stone', name: 'Stone Age', theme: 'stone',
         desc: 'Fire, hunger and the long dark. Scattered bands follow a stranger who never ages.',
-        milestone: [{ type: 'res', res: 'food', amount: 5e4 }, { type: 'res', res: 'stone', amount: 1e4 }, { type: 'research', id: 'copper_lore' }] },
+        milestone: [{ type: 'res', res: 'food', amount: 8e4 }, { type: 'res', res: 'stone', amount: 1.5e4 }, { type: 'research', id: 'copper_lore' }] },
       { id: 'bronze', name: 'Bronze Age', theme: 'bronze',
         desc: 'Cities of mud brick and ziggurats of pride. The first scribes write down your name.',
-        milestone: [{ type: 'res', res: 'bronze', amount: 3e4 }, { type: 'res', res: 'knowledge', amount: 5e3 }, { type: 'research', id: 'weighed_silver' }] },
+        milestone: [{ type: 'res', res: 'bronze', amount: 5e4 }, { type: 'res', res: 'knowledge', amount: 8e3 }, { type: 'research', id: 'weighed_silver' }] },
       { id: 'classical', name: 'Classical Age', theme: 'classical',
         desc: 'Marble, law and coin. Empires rise on roads you quietly laid down.',
         milestone: [{ type: 'res', res: 'coin', amount: 1e6 }, { type: 'res', res: 'knowledge', amount: 2e5 }, { type: 'research', id: 'feudal_oaths' }] },
@@ -95,7 +95,7 @@
         produces: { food: 18, stone: 3 }, cost: { food: [2800, 1.15], stone: [600, 1.14] } },
       // Bronze Age
       smelter: { era: 1, name: 'Copper Smelter', icon: 'smelter', desc: 'Clay furnaces coax metal from green stone.',
-        produces: { bronze: 0.5 }, cost: { food: [4000, 1.12], stone: [1500, 1.12] } },
+        produces: { bronze: 0.5 }, cost: { food: [4000, 1.3], stone: [1500, 1.3] } },
       scribe: { era: 1, name: 'Scribe', icon: 'scribe', desc: 'Presses tallies and prayers into wet clay.',
         produces: { knowledge: 0.25 }, cost: { food: [1.5e4, 1.13], bronze: [30, 1.13] } },
       fields: { era: 1, name: 'Irrigated Fields', icon: 'fields', desc: 'Canals turn the floodplain gold.',
@@ -104,7 +104,7 @@
         produces: { bronze: 8 }, cost: { bronze: [1200, 1.15], stone: [3e4, 1.12] } },
       // Classical
       market: { era: 2, name: 'Market Stall', icon: 'market', desc: 'Every road ends at a market.',
-        produces: { coin: 0.5 }, cost: { bronze: [4000, 1.13], food: [2e5, 1.12] } },
+        produces: { coin: 0.5 }, cost: { bronze: [4000, 1.3], food: [2e5, 1.3] } },
       academy: { era: 2, name: 'Academy', icon: 'academy', desc: 'Philosophers argue beneath the olive trees.',
         produces: { knowledge: 3 }, cost: { coin: [60, 1.14], knowledge: [800, 1.13] } },
       mint: { era: 2, name: 'Mint', icon: 'mint', desc: 'Silver stamped with the face of whoever rules this year.',
@@ -113,7 +113,7 @@
         produces: { coin: 50, food: 5000 }, cost: { coin: [1.2e4, 1.16], food: [1e8, 1.12] } },
       // Medieval
       chapel: { era: 3, name: 'Wayside Chapel', icon: 'chapel', desc: 'Candles lit against the dark.',
-        produces: { faith: 0.4 }, cost: { coin: [4e4, 1.13], stone: [1e7, 1.12] } },
+        produces: { faith: 0.4 }, cost: { coin: [4e4, 1.3], stone: [1e7, 1.3] } },
       monastery: { era: 3, name: 'Monastery', icon: 'monastery', desc: 'Silent orders that copy and remember.',
         produces: { knowledge: 30, faith: 0.6 }, cost: { faith: [120, 1.14], coin: [2e5, 1.12] } },
       guildhall: { era: 3, name: 'Guildhall', icon: 'guildhall', desc: 'Masters and apprentices sworn to their craft.',
@@ -122,7 +122,7 @@
         produces: { faith: 20 }, cost: { faith: [1.2e4, 1.16], stone: [1e10, 1.12] } },
       // Industrial
       steam: { era: 4, name: 'Steam Engine', icon: 'steam', desc: 'Fire made to work.',
-        produces: { energy: 0.6 }, cost: { coin: [5e7, 1.13], bronze: [1e7, 1.12] } },
+        produces: { energy: 0.6 }, cost: { coin: [5e7, 1.3], bronze: [1e7, 1.3] } },
       university: { era: 4, name: 'University', icon: 'university', desc: 'Lecture halls full of restless young minds.',
         produces: { knowledge: 1500 }, cost: { energy: [150, 1.14], faith: [5e4, 1.12] } },
       works: { era: 4, name: 'Assembly Works', icon: 'works', desc: 'A thousand hands, one rhythm.',
@@ -131,7 +131,7 @@
         produces: { energy: 25 }, cost: { energy: [2e4, 1.16], knowledge: [5e8, 1.12] } },
       // Atomic
       tabulator: { era: 5, name: 'Tabulator Bank', icon: 'tabulator', desc: 'Vacuum tubes glowing in orderly rows.',
-        produces: { compute: 0.5 }, cost: { energy: [1e6, 1.13], knowledge: [1e10, 1.12] } },
+        produces: { compute: 0.5 }, cost: { energy: [1e6, 1.3], knowledge: [1e10, 1.3] } },
       reactor: { era: 5, name: 'Fission Reactor', icon: 'reactor', desc: 'A tamed star in a concrete shell.',
         produces: { energy: 2000 }, cost: { compute: [200, 1.14], energy: [5e6, 1.12] } },
       lab: { era: 5, name: 'Research Laboratory', icon: 'lab', desc: 'White coats and whiter light.',
@@ -140,7 +140,7 @@
         produces: { compute: 20 }, cost: { compute: [3e4, 1.16], energy: [1e9, 1.12] } },
       // Spacefaring
       launch: { era: 6, name: 'Launch Complex', icon: 'launch', desc: 'Towers of flame on the equator.',
-        produces: { alloy: 0.5 }, cost: { compute: [5e5, 1.13], energy: [1e11, 1.12] } },
+        produces: { alloy: 0.5 }, cost: { compute: [5e5, 1.3], energy: [1e11, 1.3] } },
       orbital_smelter: { era: 6, name: 'Orbital Smelter', icon: 'orbital_smelter', desc: 'Mirrors focus sunlight onto molten ore.',
         produces: { alloy: 6 }, cost: { alloy: [250, 1.15], compute: [5e6, 1.12] } },
       observatory: { era: 6, name: 'Lunar Observatory', icon: 'observatory', desc: 'The far side of the moon listens to the universe.',
@@ -301,15 +301,15 @@
         effects: [{ type: 'unlock', key: 'agent:governor' }, { type: 'worldOutput', mult: 1.5 }] },
       survey_net: { era: 7, tier: 0, name: 'Survey Network', cost: { starmatter: 8e4 }, desc: 'Probes find a second world beside every target.',
         effects: [{ type: 'colonyYield', add: 1 }] },
-      drive: { era: 7, tier: 1, name: 'Drive Efficiency', cost: { starmatter: [2000, 4] }, maxLevel: 10, prereq: ['ark_doctrine'],
-        desc: 'Ships cross the dark faster.', effects: [{ type: 'shipSpeed', mult: 1.3 }] },
-      hulls: { era: 7, tier: 1, name: 'Modular Hulls', cost: { starmatter: [4000, 5] }, maxLevel: 10, prereq: ['ark_doctrine'],
+      drive: { era: 7, tier: 1, name: 'Drive Efficiency', cost: { starmatter: [2000, 8] }, maxLevel: 8, prereq: ['ark_doctrine'],
+        desc: 'Ships cross the dark faster.', effects: [{ type: 'shipSpeed', mult: 1.25 }] },
+      hulls: { era: 7, tier: 1, name: 'Modular Hulls', cost: { starmatter: [4000, 10] }, maxLevel: 8, prereq: ['ark_doctrine'],
         desc: 'Colony ships assembled from standard parts.', effects: [{ type: 'shipCost', mult: 0.85 }] },
-      seeding: { era: 7, tier: 1, name: 'Biome Seeding', cost: { starmatter: [3000, 4.5] }, maxLevel: 10, prereq: ['survey_net'],
+      seeding: { era: 7, tier: 1, name: 'Biome Seeding', cost: { starmatter: [3000, 9] }, maxLevel: 8, prereq: ['survey_net'],
         desc: 'Engineered life takes root faster.', effects: [{ type: 'maturation', mult: 1.25 }] },
       terraform: { era: 7, tier: 2, name: 'Terraforming', cost: { starmatter: [6000, 3.5] }, maxLevel: 20, prereq: ['seeding'],
         desc: 'Every world grows a little kinder.', effects: [{ type: 'hab', add: 0.05 }] },
-      cryo: { era: 7, tier: 2, name: 'Cryo-berths', cost: { starmatter: [6e5, 8] }, maxLevel: 10, prereq: ['survey_net', 'hulls'],
+      cryo: { era: 7, tier: 2, name: 'Cryo-berths', cost: { starmatter: [6e5, 20] }, maxLevel: 5, prereq: ['survey_net', 'hulls'],
         desc: 'Each ark sleeps enough colonists for another world.', effects: [{ type: 'colonyYield', add: 1 }] },
       orbital_habitats: { era: 7, tier: 2, name: 'Orbital Habitats', cost: { starmatter: 4e4, knowledge: 1e24 }, prereq: ['seeding'],
         desc: 'Stations make hostile worlds livable.', effects: [{ type: 'hab', add: 0.1 }] },
@@ -327,39 +327,39 @@
         desc: 'Asteroid fields hollowed into mines.', effects: [{ type: 'hab', planet: 'asteroid', add: 0.08 }] },
       barren_domes: { era: 7, tier: 3, name: 'Pressure Domes', cost: { starmatter: [60000.0, 4] }, maxLevel: 5, prereq: ['orbital_habitats'],
         desc: 'Glass and steel over dead rock.', effects: [{ type: 'hab', planet: 'barren', add: 0.08 }] },
-      stellar_industry: { era: 7, tier: 4, name: 'Stellar Industry', cost: { starmatter: [1e5, 6] }, maxLevel: 40, prereq: ['cryo', 'terraform'],
-        desc: 'Each world a forge.', effects: [{ type: 'worldOutput', mult: 1.4 }] },
+      stellar_industry: { era: 7, tier: 4, name: 'Stellar Industry', cost: { starmatter: [1e5, 10] }, maxLevel: 30, prereq: ['cryo', 'terraform'],
+        desc: 'Each world a forge.', effects: [{ type: 'worldOutput', mult: 1.25 }] },
       integration: { era: 7, tier: 4, name: 'Imperial Integration', cost: { starmatter: [1e5, 4] }, maxLevel: 10, prereq: ['orbital_habitats'],
         desc: 'Colonies feed the old industries of the cradle.', effects: [{ type: 'worldBonus', add: 0.005 }] },
       // ---- Galactic War (repeatable military tech; enemies escalate forever, so do you)
       admiralty: { era: 8, tier: 0, name: 'Admiralty', cost: { materiel: 200 }, desc: 'A command staff for a war without end. Unlocks Admiral agents.',
         effects: [{ type: 'unlock', key: 'agent:admiral' }, { type: 'fleetPower', mult: 1.25 }] },
-      war_economy: { era: 8, tier: 0, name: 'War Economy', cost: { materiel: [800, 3] }, maxLevel: 25,
-        desc: 'Every factory retooled for the front.', effects: [{ type: 'prod', gen: ['yard', 'barracks'], mult: 1.4 }] },
-      mobilization: { era: 8, tier: 0, name: 'Total Mobilization', cost: { starmatter: [2e6, 3] }, maxLevel: 25,
-        desc: 'The whole empire forges weapons.', effects: [{ type: 'prod', res: 'materiel', mult: 1.5 }] },
-      lances: { era: 8, tier: 1, name: 'Lance Batteries', cost: { materiel: [2000, 3] }, maxLevel: 40, prereq: ['admiralty'],
-        desc: 'Spinal guns that split moons.', effects: [{ type: 'fleetPower', mult: 1.5 }] },
+      war_economy: { era: 8, tier: 0, name: 'War Economy', cost: { materiel: [800, 4] }, maxLevel: 30,
+        desc: 'Every factory retooled for the front.', effects: [{ type: 'prod', gen: ['yard', 'barracks'], mult: 1.25 }] },
+      mobilization: { era: 8, tier: 0, name: 'Total Mobilization', cost: { starmatter: [2e6, 4.5] }, maxLevel: 30,
+        desc: 'The whole empire forges weapons.', effects: [{ type: 'prod', res: 'materiel', mult: 1.3 }] },
+      lances: { era: 8, tier: 1, name: 'Lance Batteries', cost: { materiel: [2000, 4] }, maxLevel: 60, prereq: ['admiralty'],
+        desc: 'Spinal guns that split moons.', effects: [{ type: 'fleetPower', mult: 1.3 }] },
       ablative: { era: 8, tier: 1, name: 'Ablative Armor', cost: { materiel: [3000, 3.5] }, maxLevel: 15, prereq: ['admiralty'],
         desc: 'Hulls that burn away instead of breaking.', effects: [{ type: 'attrition', mult: 0.88 }] },
-      keels: { era: 8, tier: 1, name: 'Dreadnought Keels', cost: { materiel: [5000, 4] }, maxLevel: 10, prereq: ['war_economy'],
-        desc: 'Bigger ships, bigger guns.', effects: [{ type: 'unitPower', unit: 'warship', mult: 2 }] },
-      drop_armor: { era: 8, tier: 1, name: 'Drop Armor', cost: { materiel: [4000, 4] }, maxLevel: 10, prereq: ['war_economy'],
-        desc: 'Legions that survive orbital insertion under fire.', effects: [{ type: 'unitPower', unit: 'legion', mult: 2 }] },
-      fleet_logistics: { era: 8, tier: 2, name: 'Fleet Logistics', cost: { materiel: [1e4, 4] }, maxLevel: 10, prereq: ['lances'],
+      keels: { era: 8, tier: 1, name: 'Dreadnought Keels', cost: { materiel: [5000, 6] }, maxLevel: 12, prereq: ['war_economy'],
+        desc: 'Bigger ships, bigger guns.', effects: [{ type: 'unitPower', unit: 'warship', mult: 1.5 }] },
+      drop_armor: { era: 8, tier: 1, name: 'Drop Armor', cost: { materiel: [4000, 6] }, maxLevel: 12, prereq: ['war_economy'],
+        desc: 'Legions that survive orbital insertion under fire.', effects: [{ type: 'unitPower', unit: 'legion', mult: 1.5 }] },
+      fleet_logistics: { era: 8, tier: 2, name: 'Fleet Logistics', cost: { materiel: [1e4, 6] }, maxLevel: 8, prereq: ['lances'],
         desc: 'Supply lines that keep offensives moving.', effects: [{ type: 'frontSpeed', mult: 1.2 }] },
       occupation: { era: 8, tier: 2, name: 'Occupation Doctrine', cost: { materiel: 2e4, starmatter: 1e8 }, prereq: ['drop_armor'],
         desc: 'Conquered worlds are held, not razed.', effects: [{ type: 'captureMult', mult: 2 }] },
       scorched: { era: 8, tier: 2, name: 'Scorched Retreat', cost: { materiel: 3e4, starmatter: 2e8 }, prereq: ['ablative'],
         desc: 'Evacuate and burn what cannot be held.', effects: [{ type: 'lossMult', mult: 0.5 }] },
-      swarm_burners: { era: 8, tier: 3, name: 'Swarm Burners', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['lances'],
-        desc: 'Incendiary fields that cook Vorrhal broods.', effects: [{ type: 'counter', faction: 'vorrhal', mult: 1.8 }] },
-      choir_breakers: { era: 8, tier: 3, name: 'Choir Breakers', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['lances'],
-        desc: 'Resonance torpedoes that shatter pale hulls.', effects: [{ type: 'counter', faction: 'ashen', mult: 1.8 }] },
-      hullfoam: { era: 8, tier: 3, name: 'Hullfoam Sealant', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['ablative'],
-        desc: 'Self-sealing hulls that deny Thessik corrosion.', effects: [{ type: 'counter', faction: 'thessik', mult: 1.8 }] },
-      disruptors: { era: 8, tier: 3, name: 'Disruptor Arrays', cost: { materiel: [2e4, 3.5] }, maxLevel: 15, prereq: ['fleet_logistics'],
-        desc: 'Logic-scrambling beams. The Hollow Lattice has no defense against them.', effects: [{ type: 'fleetPower', mult: 1.2 }, { type: 'counter', faction: 'lattice', mult: 2.5 }] },
+      swarm_burners: { era: 8, tier: 3, name: 'Swarm Burners', cost: { materiel: [1.5e4, 4] }, maxLevel: 20, prereq: ['lances'],
+        desc: 'Incendiary fields that cook Vorrhal broods.', effects: [{ type: 'counter', faction: 'vorrhal', mult: 1.5 }] },
+      choir_breakers: { era: 8, tier: 3, name: 'Choir Breakers', cost: { materiel: [1.5e4, 4] }, maxLevel: 20, prereq: ['lances'],
+        desc: 'Resonance torpedoes that shatter pale hulls.', effects: [{ type: 'counter', faction: 'ashen', mult: 1.5 }] },
+      hullfoam: { era: 8, tier: 3, name: 'Hullfoam Sealant', cost: { materiel: [1.5e4, 4] }, maxLevel: 20, prereq: ['ablative'],
+        desc: 'Self-sealing hulls that deny Thessik corrosion.', effects: [{ type: 'counter', faction: 'thessik', mult: 1.5 }] },
+      disruptors: { era: 8, tier: 3, name: 'Disruptor Arrays', cost: { materiel: [2e4, 4] }, maxLevel: 20, prereq: ['fleet_logistics'],
+        desc: 'Logic-scrambling beams. The Hollow Lattice has no defense against them.', effects: [{ type: 'fleetPower', mult: 1.1 }, { type: 'counter', faction: 'lattice', mult: 2 }] },
     },
 
     // Display names for {type:'unlock'} keys
@@ -467,14 +467,15 @@
       matureSeconds: 600,     // time to reach full output (before maturation bonuses)
       startFrac: 0.05,        // output fraction of a freshly claimed world
       bucketSeconds: 30,      // claim-time bucket size for cohorts
-      shipCost: { starmatter: 1000, alloy: 1e7 },
+      shipCost: { starmatter: 1000 },
       travelSeconds: 90,
       flightBucket: 5,        // ships launched within this many seconds travel together
       baseYield: 1,           // worlds claimed per ship
       worldBonus: 0.02,       // each matured world: +2% to every older era's generators
       firstContact: 20000,
       galaxy: { stars: 7000, arms: 4, seed: 7331, fullAtWorlds: 1e9 },
-      capacity: 1e12,         // the galaxy is finite: claims taper as the empire approaches this many worlds
+      freeSpace: 60000,       // uncontested worlds available to colonize; colonization tapers toward this limit
+      captureOpensSpace: 2,   // each world captured in war opens this many more worlds to colonization
     },
 
     // ---------------------------------------------------------------- Galactic War
@@ -485,9 +486,10 @@
     //   Emax = base × strength trait × depthGrowth^depth × timeGrowth^(minutes at war × growth trait) × enemyStrength
     war: {
       unitPower: { warship: 12, legion: 1 },
-      baseEnemy: 3000,
+      baseEnemy: 3000,          // minimum starting enemy strength
+      enemyScale: 20000,        // …or this × your Starmatter/s at first contact, whichever is larger
       depthGrowth: 3,
-      timeGrowthPerMin: 1.035,
+      timeGrowthPerMin: 1.02,
       regenPerSec: 0.04,
       floorFrac: 0.05,          // enemy strength never drops below this fraction of Emax
       playerLethality: 0.08,
@@ -496,15 +498,15 @@
       retreatSpeed: 1 / 240,
       graceSeconds: 300,        // after first contact the enemy does not push for this long
       captureBase: 500,         // worlds captured per victory: captureBase × captureGrowth^depth × captureMult
-      captureGrowth: 1.35,
+      captureGrowth: 1.4,
       lossFrac: 0.02,           // worlds lost per defeat: max(lossMin, lossFrac × worlds) × lossMult
       lossMin: 50,
       coreFloor: 0.5,           // the empire never drops below this share of the worlds held at first contact
       lullSeconds: 120,         // after a collapse the enemy regroups and cannot push that front for a while
       lullEnemyFrac: 0.5,       // ...and its strength on that front falls to this fraction
       factions: {
-        vorrhal: { name: 'Vorrhal Brood', color: '#9be15d', fronts: 2, traits: { growth: 1.6 },
-          desc: 'A hive-swarm that breeds faster than it can be killed.', traitText: 'Grows fast (escalation ×1.6).' },
+        vorrhal: { name: 'Vorrhal Brood', color: '#9be15d', fronts: 2, traits: { growth: 1.4 },
+          desc: 'A hive-swarm that breeds faster than it can be killed.', traitText: 'Grows fast (escalation ×1.4).' },
         ashen: { name: 'Ashen Choir', color: '#e6e1d6', fronts: 1, traits: { strength: 2.5, growth: 0.8 },
           desc: 'Pale silent ships that shrug off fire.', traitText: 'High defense (strength ×2.5), slow to grow.' },
         thessik: { name: 'Thessik Reach', color: '#ff7a3d', fronts: 1, traits: { lethality: 2.2 },
@@ -595,6 +597,7 @@
       offset: 8,
       power: 1.5,
       eraBonus: [0, 0, 5, 10, 20, 40, 80, 160, 320],
+      frontBonus: 8,          // + points per front won this run (rewards pushing the war deeper)
     },
 
     // ---------------------------------------------------------------- Immortal's Power Tree
@@ -614,27 +617,27 @@
       ],
       nodes: {
         // Dominion — production multipliers
-        dom1: { branch: 0, depth: 1, name: 'Voice in the Fire', maxLevel: 10, cost: [1, 2],
-          desc: 'Your whisper quickens every hand.', effects: [{ type: 'global', mult: 1.5 }] },
-        dom2: { branch: 0, depth: 2, name: 'Hand on the Scales', maxLevel: 10, cost: [25, 2.5], req: { dom1: 3 },
-          desc: 'Fortune favors what you favor.', effects: [{ type: 'global', mult: 2 }] },
-        dom3: { branch: 0, depth: 3, name: 'Eternal Dominion', maxLevel: 25, cost: [500, 3], req: { dom2: 3 }, reqEra: 7,
-          desc: 'Stars bend to an older will.', effects: [{ type: 'global', mult: 3 }] },
+        dom1: { branch: 0, depth: 1, name: 'Voice in the Fire', maxLevel: 20, cost: [1, 2],
+          desc: 'Your whisper quickens every hand.', effects: [{ type: 'global', mult: 1.25 }] },
+        dom2: { branch: 0, depth: 2, name: 'Hand on the Scales', maxLevel: 15, cost: [20, 2.5], req: { dom1: 5 },
+          desc: 'Fortune favors what you favor.', effects: [{ type: 'global', mult: 1.5 }] },
+        dom3: { branch: 0, depth: 3, name: 'Eternal Dominion', maxLevel: 25, cost: [400, 3], req: { dom2: 3 }, reqEra: 7,
+          desc: 'Stars bend to an older will.', effects: [{ type: 'global', mult: 2 }, { type: 'worldOutput', mult: 1.25 }] },
         // Echoes of the First Fire — faster early eras
-        echo1: { branch: 1, depth: 1, name: 'Remembered Fire', maxLevel: 5, cost: [1, 2.2],
-          desc: 'The first ages come easier each time.', effects: [{ type: 'prod', era: [0, 1], mult: 2 }] },
-        echo2: { branch: 1, depth: 2, name: 'Remembered Roads', maxLevel: 5, cost: [6, 2.4], req: { echo1: 2 },
-          desc: 'Empires rise along familiar paths.', effects: [{ type: 'prod', era: [2, 3], mult: 2 }] },
-        echo3: { branch: 1, depth: 3, name: 'Remembered Engines', maxLevel: 5, cost: [40, 2.5], req: { echo2: 2 }, reqEra: 4,
-          desc: 'Industry is rediscovered, not invented.', effects: [{ type: 'prod', era: [4, 5, 6], mult: 2 }] },
+        echo1: { branch: 1, depth: 1, name: 'Remembered Fire', maxLevel: 8, cost: [1, 2],
+          desc: 'The first ages come easier each time.', effects: [{ type: 'prod', era: [0, 1], mult: 1.5 }] },
+        echo2: { branch: 1, depth: 2, name: 'Remembered Roads', maxLevel: 8, cost: [5, 2.2], req: { echo1: 2 },
+          desc: 'Empires rise along familiar paths.', effects: [{ type: 'prod', era: [2, 3], mult: 1.5 }] },
+        echo3: { branch: 1, depth: 3, name: 'Remembered Engines', maxLevel: 8, cost: [30, 2.4], req: { echo2: 2 }, reqEra: 4,
+          desc: 'Industry is rediscovered, not invented.', effects: [{ type: 'prod', era: [4, 5, 6], mult: 1.5 }] },
         echo_ms: { branch: 1, depth: 2, lat: 0.32, name: 'Swift Milestones', maxLevel: 3, cost: [10, 3.5], req: { echo1: 3 },
           desc: 'Each age needs less to be born.', effects: [{ type: 'eraReq', mult: 0.7 }] },
         echo_mem: { branch: 1, depth: 3, lat: 0.3, name: 'Deep Memory', maxLevel: 2, cost: [20, 5], req: { echo_ms: 1 },
           desc: 'Level 1: every run starts with all Stone Age research. Level 2: Bronze Age research too.',
           effects: [{ type: 'unlock', key: 'memory:0' }], levelEffects: { 2: [{ type: 'unlock', key: 'memory:1' }] } },
         // Retinue — stronger and cheaper agents
-        ret1: { branch: 2, depth: 1, name: 'Loyal Retinue', maxLevel: 8, cost: [2, 2],
-          desc: 'Your servants work faster.', effects: [{ type: 'agentSpeed', mult: 1.25 }] },
+        ret1: { branch: 2, depth: 1, name: 'Loyal Retinue', maxLevel: 10, cost: [2, 2],
+          desc: 'Your servants work faster.', effects: [{ type: 'agentSpeed', mult: 1.2 }] },
         ret_first: { branch: 2, depth: 2, lat: 0.3, name: 'First Disciple', maxLevel: 1, cost: [3, 1], req: { ret1: 1 },
           desc: 'Shamans can be recruited from the first moment of every run.', effects: [{ type: 'unlock', key: 'agent:shaman' }] },
         ret2: { branch: 2, depth: 2, name: 'Cheap Devotion', maxLevel: 5, cost: [4, 2.2], req: { ret1: 2 },

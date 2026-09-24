@@ -1,14 +1,24 @@
 'use strict';
-// Headless pacing simulator. Plays the real game code with a simple purchasing strategy and reports how long
-// each era takes, per run (prestige-to-prestige).
+// Headless pacing simulator. Plays the real game code (loaded from index.html's logic scripts) with a simple
+// purchasing strategy and reports how long each era takes per run (prestige to prestige).
 //
-//   node tools/sim.js [--hours 12] [--dt 1] [--cps 4] [--runs 8] [--verbose] [--prestige auto|none]
+//   node tools/sim.js [flags]
+//     --hours 8          simulated play time            --dt 3          seconds per simulation step
+//     --cps 4            forage clicks/s (early eras)    --manage 2      seconds between strategy decisions
+//     --prestige auto    'auto' | 'none'                 --stall 20      minutes without a new era → prestige
+//     --reserve 180      save for the milestone once it is this many seconds away
+//     --mult 1           flat production multiplier (models prestige power when testing era lengths)
+//     --set a.b.0=v      override any config value (repeatable), e.g. --set eras.2.milestone.0.amount=1e6
+//     --runs 30          stop after this many prestiges  --verbose       resource snapshots every 10 min
+//     --warlog           war state every 5 min           --snapshot f    write state at first contact
+//     --from f           start from a saved state file
 //
 // Strategy (an attentive active player):
-//  - forages `cps` times per second while forage is meaningful (Stone/Bronze), less later
+//  - forages `cps` times per second in the Stone/Bronze ages, half that until the Industrial Age
 //  - buys research, generators, upgrades, trade routes, rites, grid, compute, megaprojects, agents greedily,
-//    but reserves resources it needs for the current era milestone once that milestone is close
-//  - advances eras as soon as possible; prestiges using the rule in `shouldPrestige`
+//    reserving resources for the current era milestone once that milestone is close
+//  - builds colony arks only while there is space; auto-allocates the fleet; buys war industry
+//  - advances eras immediately; prestiges when the gain ≥ 2× lifetime points + 10, or when stalled
 const { load } = require('./headless');
 
 const args = process.argv.slice(2);
@@ -24,12 +34,33 @@ const CPS = parseFloat(arg('cps', 4));
 const MAX_RUNS = parseInt(arg('runs', 30), 10);
 const VERBOSE = !!arg('verbose', false);
 const PRESTIGE = arg('prestige', 'auto');
-const STALL = parseFloat(arg('stall', 15)) * 60;   // minutes without a new era before a stalled prestige
+const STALL = parseFloat(arg('stall', 20)) * 60;
+const MULT = parseFloat(arg('mult', 1));            // flat production multiplier (models prestige power)
+const MANAGE_EVERY = parseFloat(arg('manage', 2));  // seconds between strategy decisions
+const RESERVE = parseFloat(arg('reserve', 180));
+const WARLOG = !!arg('warlog', false);
+const SNAP_OUT = arg('snapshot', '');   // write the state at first contact to this file
+const SNAP_IN = arg('from', '');        // start from a saved state file
+let warLogAt = 0;
+let snapDone = false;    // save for the milestone once it is this many seconds away   // minutes without a new era before a stalled prestige
 
 let clock = 1e12;
 const { IG, context } = load({ clock: () => clock });
 const Decimal = context.Decimal;
+// --set a.b.0.c=value overrides config values (for parallel balance experiments)
+for (let i = 0; i < args.length; i++) {
+  if (args[i] !== '--set') continue;
+  const [path, raw] = args[i + 1].split('=');
+  const keys = path.split('.');
+  let o = IG.CONFIG;
+  for (let k = 0; k < keys.length - 1; k++) o = o[keys[k]];
+  let v = Number(raw);
+  if (Number.isNaN(v)) { try { v = JSON.parse(raw); } catch (e) { v = raw; } }
+  o[keys[keys.length - 1]] = v;
+}
 IG.Game.newGame();
+if (SNAP_IN) { IG.state = IG.Save.hydrate(IG.Save.deserialize(require('fs').readFileSync(SNAP_IN, 'utf8'))); IG.Game.refresh(); }
+if (MULT !== 1) { IG.state.meta.devMult = MULT; IG.Mods.dirty = true; }
 const C = IG.CONFIG;
 const D = IG.D;
 
@@ -45,7 +76,7 @@ function reserved() {
     const have = IG.state.run.resources[c.res];
     if (have.gte(need)) { out[c.res] = 1; continue; }
     const rate = IG.Prod.cache.rates[c.res] || D(0);
-    if (rate.gt(0) && need.sub(have).div(rate).lt(600)) out[c.res] = 1;
+    if (rate.gt(0) && need.sub(have).div(rate).lt(RESERVE)) out[c.res] = 1;
   }
   return out;
 }
@@ -90,10 +121,7 @@ function manage(res) {
   const s = IG.state;
   // research first — it is the cheapest multiplier
   let id, n = 0;
-  while ((id = IG.Research.cheapestAffordable()) && n++ < 20) {
-    if (!affordableWith(IG.Research.cost(id), res, 1)) break;
-    IG.Research.buy(id, true);
-  }
+  while ((id = IG.Research.cheapestAffordable()) && n++ < 20) IG.Research.buy(id, true);
   // agents: recruit one of each unlocked type, then keep them upgraded
   for (const t in C.agents.types) {
     if (!IG.Agents.typeUnlocked(t)) continue;
@@ -109,9 +137,9 @@ function manage(res) {
   if (IG.Grid.unlocked() && !IG.Agents.occupant('grid')) IG.Agents.actions.grid({ level: 1 });
   if (IG.Compute.unlocked() && IG.Compute.totalShare() < 0.99) IG.Compute.balance();
   if (IG.Mega.unlocked() && !s.run.mega.active) { const m = IG.Mega.cheapestAvailable(); if (m) IG.Mega.start(m); }
-  if (IG.Expansion && IG.Expansion.active()) IG.Expansion.buildShips('max', true);
   if (IG.War && IG.War.active()) IG.War.autoAllocate();
   buyGenerators(res);
+  if (IG.Expansion && IG.Expansion.active()) IG.Expansion.buildShips('max', true);
 }
 
 // ------------------------------------------------------------------ prestige rule
@@ -136,6 +164,7 @@ let cur = { eras: [0], start: 0 };
 let t = 0;
 const end = HOURS * 3600;
 let lastLog = 0;
+let manageAcc = 0;
 while (t < end) {
   const s = IG.state;
   IG.Game.tick(DT);
@@ -143,7 +172,8 @@ while (t < end) {
   t += DT;
   const clicks = s.run.era <= 1 ? CPS : s.run.era <= 3 ? CPS / 2 : 0;
   if (clicks > 0) IG.Prod.forage(clicks * DT, true);
-  manage(reserved());
+  manageAcc += DT;
+  if (manageAcc >= MANAGE_EVERY) { manageAcc = 0; manage(reserved()); }
   if (IG.Eras.canAdvance()) {
     IG.Eras.advance();
     cur.eras[s.run.era] = s.run.time;
@@ -156,6 +186,23 @@ while (t < end) {
       .map((r) => r + '=' + IG.fmt(s.run.resources[r]) + '(' + IG.fmt(IG.Prod.cache.rates[r] || 0) + '/s)').join(' ');
     console.log('    t=' + IG.fmtTime(t) + ' era=' + s.run.era + ' ' + rs);
   }
+  if (SNAP_OUT && s.run.war && !snapDone) {
+    snapDone = true;
+    require('fs').writeFileSync(SNAP_OUT, IG.Save.serialize(s));
+    console.log('  snapshot written at ' + IG.fmtTime(t));
+  }
+  if (WARLOG && s.run.war && t - warLogAt >= 300) {
+    warLogAt = t;
+    const w = s.run.war, g = IG.Prod.cache.gross;
+    console.log('  war t+' + IG.fmtTime(s.run.time - w.start) + ' fleet ' + IG.fmt(IG.War.fleetStrength()) + ' ships ' + IG.fmt(s.run.resources.warships) +
+      ' leg ' + IG.fmt(s.run.resources.legions) + ' mat/s ' + IG.fmt(g.materiel) + ' sm/s ' + IG.fmt(g.starmatter) + ' loss/s ' + IG.fmt(w.lossRate) +
+      ' won ' + w.won + ' lost ' + w.lost + ' worlds ' + IG.fmtInt(IG.Expansion.totalWorlds()) +
+      ' gens ' + ['foundry', 'yard', 'barracks', 'forge_world'].map((k) => s.run.gens[k].n).join('/') +
+      ' | ' + w.fronts.map((f) => (f.progress * 100).toFixed(0) + '%:' + IG.fmt(f.enemy)).join(' ') +
+      ' | tech ' + ['lances', 'war_economy', 'mobilization', 'keels'].map((k) => IG.Research.level(k)).join('/'));
+  }
+  // record eras entered by any means (auto-advance such as First Contact included)
+  for (let e = 1; e <= s.run.era; e++) if (cur.eras[e] === undefined && s.run.eraTimes[e] !== undefined) { cur.eras[e] = s.run.eraTimes[e]; lastEraAt = s.run.time; }
   if (shouldPrestige()) {
     const gain = IG.Prestige.gain();
     results.push({ eras: cur.eras.slice(), time: s.run.time, pp: gain, highest: s.run.era });
@@ -179,6 +226,18 @@ results.forEach((r, i) => {
   for (let e = 1; e < C.eras.length; e++) cols.push(r.eras[e] !== undefined ? IG.fmtTime(r.eras[e]) : '-');
   console.log(cols.map((c) => c.padEnd(11)).join(''));
 });
+let cum = 0;
+const firstReach = {};
+results.forEach((r, i) => {
+  for (let e = 1; e < C.eras.length; e++) if (r.eras[e] !== undefined && firstReach[e] === undefined) firstReach[e] = { run: i + 1, total: cum + r.eras[e] };
+  cum += r.time;
+});
+console.log('\nFirst time each era was reached (run #, total play time):');
+for (let e = 1; e < C.eras.length; e++) {
+  const f = firstReach[e];
+  console.log('  ' + C.eras[e].name.padEnd(18) + (f ? 'run ' + f.run + ', ' + IG.fmtTime(f.total) : 'not reached'));
+}
+if (IG.state.run.war) console.log('War: fronts won ' + IG.state.perm.stats.frontsWon + ', lost ' + IG.state.perm.stats.frontsLost + ', worlds ' + IG.fmtInt(IG.Expansion.totalWorlds()));
 const firstInterstellar = results.findIndex((r) => r.eras[7] !== undefined);
 console.log('\nFirst prestige available (Classical) in run 1 at: ' + (results[0].eras[2] !== undefined ? IG.fmtTime(results[0].eras[2]) : 'never'));
 console.log('First Interstellar: ' + (firstInterstellar >= 0 ? 'run ' + (firstInterstellar + 1) : 'not reached'));
