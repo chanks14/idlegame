@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Undying Hand — From Stone Age to Galactic Empire</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-era="stone">
+  <div id="app">
+    <header id="header">
+      <div class="brand"><span class="brand-title">The Undying Hand</span><span class="brand-sub">From Stone Age to Galactic Empire</span></div>
+      <div id="era-badge" class="era-badge"></div>
+      <div id="res-bar" class="res-bar"></div>
+      <div id="pp-chip" class="pp-chip hidden"></div>
+      <div class="hdr-btns"><button id="btn-save" class="btn small" title="Save (S)">Save</button></div>
+    </header>
+    <nav id="tabbar" class="tabbar"></nav>
+    <div id="main">
+      <section id="tab-content"></section>
+      <aside id="sidebar">
+        <div id="era-card" class="card era-card"></div>
+        <div id="res-panel" class="card res-panel"></div>
+        <div class="card log-panel"><div class="panel-title">Chronicle</div><div id="log" class="log"></div></div>
+      </aside>
+    </div>
+  </div>
+  <canvas id="fx-canvas"></canvas>
+  <div id="popups"></div>
+  <div id="toasts"></div>
+  <div id="transition" class="transition"></div>
+  <div id="modal-root"></div>
+  <div id="dev-panel" class="dev-panel"></div>
+
+  <!-- library -->
+  <script src="lib/break_infinity.min.js"></script>
+  <!-- optional asset overrides (icons) -->
+  <script src="assets/manifest.js"></script>
+  <!-- core -->
+  <script src="js/core/util.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/core/format.js"></script>
+  <script src="js/core/events.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/core/modifiers.js"></script>
+  <!-- systems -->
+  <script src="js/systems/production.js"></script>
+  <script src="js/systems/eras.js"></script>
+  <script src="js/systems/research.js"></script>
+  <!-- engine -->
+  <script src="js/game.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/offline.js"></script>
+  <script src="js/loop.js"></script>
+  <!-- ui -->
+  <script src="js/ui/dom.js"></script>
+  <script src="js/ui/icons.js"></script>
+  <script src="js/ui/describe.js"></script>
+  <script src="js/ui/ui.js"></script>
+  <script src="js/ui/production.js"></script>
+  <script src="js/ui/research.js"></script>
+  <script src="js/ui/settings.js"></script>
+  <script src="js/ui/modals.js"></script>
+  <script src="js/ui/juice.js"></script>
+  <script src="js/ui/dev.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
