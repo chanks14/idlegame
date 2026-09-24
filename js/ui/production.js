@@ -132,6 +132,7 @@
       const era = C.eras[e];
       const gens = IG.Prod.listForEra(e).filter(IG.Prod.unlocked);
       const mechs = mechanics.filter((m) => m.era === e && (!m.isUnlocked || m.isUnlocked()));
+      const mechTeasers = mechanics.filter((m) => m.era === e && m.isUnlocked && !m.isUnlocked() && m.teaser);
       if (!gens.length && !mechs.length && !(e === 0)) continue;
       const sec = el('section', { class: 'era-section theme-' + era.theme + (collapsed[e] ? ' collapsed' : '') });
       const head = el('div', { class: 'era-head', on: { click: () => {
@@ -145,6 +146,10 @@
           const upd = m.build(box);
           sec.appendChild(box);
           if (upd) mechUpdaters.push(upd);
+        }
+        for (const m of mechTeasers) {
+          sec.appendChild(el('div', { class: 'mech-teaser', tip: '<b>???</b><br>' + m.teaser() }, [IG.icons.node('lock'),
+            el('span', { text: '??? — ' + m.teaser() })]));
         }
         const grid = el('div', { class: 'gen-grid' });
         for (const id of gens) {

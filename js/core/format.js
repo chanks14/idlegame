@@ -46,23 +46,23 @@
     if (a.lt(1000)) {
       out = small(a.toNumber(), opts && opts.places);
     } else {
-      const e = a.exponent;
-      const m = a.mantissa;
+      let e = a.exponent;
+      let m = a.mantissa;
+      // carry rounding (9.999 → 10.00) into the exponent before choosing the display unit
+      if (parseFloat(m.toFixed(2)) >= 10) { m /= 10; e += 1; }
       const f = mode();
       if (f === 'scientific') {
         out = m.toFixed(2) + 'e' + e;
-      } else if (f === 'engineering') {
-        const e3 = Math.floor(e / 3) * 3;
-        const mm = m * Math.pow(10, e - e3);
-        out = mm.toFixed(mm >= 100 ? 1 : 2) + 'e' + e3;
       } else {
-        const n = Math.floor(e / 3);
-        const sfx = suffixFor(n);
-        if (sfx === null) {
-          out = m.toFixed(2) + 'e' + e;
+        let n = Math.floor(e / 3);
+        let mm = m * Math.pow(10, e - n * 3);
+        let str = mm >= 100 ? mm.toFixed(1) : mm.toFixed(2);
+        if (parseFloat(str) >= 1000) { n += 1; mm /= 1000; str = mm.toFixed(2); }
+        if (f === 'engineering') {
+          out = str + 'e' + (n * 3);
         } else {
-          const mm = m * Math.pow(10, e - n * 3);
-          out = (mm >= 100 ? mm.toFixed(1) : mm.toFixed(2)) + sfx;
+          const sfx = suffixFor(n);
+          out = sfx === null ? m.toFixed(2) + 'e' + e : str + sfx;
         }
       }
     }

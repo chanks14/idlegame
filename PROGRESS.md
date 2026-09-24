@@ -3,7 +3,7 @@
 ## Phase checklist
 - [x] 1. Setup + core engine (loop, big numbers, save/load/export/import, offline + welcome back, number
        formatting, dev mode, config). Stone Age playable.
-- [ ] 2. Eras 2–7: generators, research, agents, buy multipliers, achievements, stats, event log, unlock
+- [x] 2. Eras 2–7: generators, research, agents, buy multipliers, achievements, stats, event log, unlock
        teasers, era color themes.
 - [ ] 3. Prestige and the Immortal's Power Tree.
 - [ ] 4. Interstellar Age: planet types, habitability, cohorts, maturation, colony ships, galaxy canvas,
@@ -28,8 +28,25 @@
   era, grant PP, meet milestone).
 - `node tools/check.js` = syntax check + headless smoke test + save round-trip + offline cap test.
 
+### Phase 2 — Eras 2–7 (Bronze → Spacefaring)
+- 7 eras total in config, each with 4 generators, a 7–9 tech research tree and a milestone.
+- New resources: Bronze, Knowledge (research currency), Coin, Faith, Energy, Compute, Alloy.
+- Era mechanics (each its own system + Production-tab panel):
+  Trade Routes (Classical, additive per-level bonus), Rites (Medieval, timed buffs w/ escalating cost),
+  Power Grid (Industrial, sector multipliers with energy upkeep + brown-out), Compute Programs (Atomic,
+  slider allocation of compute capacity), Megaprojects (Spacefaring, production share diverted to builds).
+- Synergies: later resources (produced this run) multiply every earlier era's generators (log-based).
+- Agents: 8 types (Shaman → Navigator), recruit/assign/upgrade, 14 areas, procedurally generated names.
+- 46 achievements (×1.02 production each), Stats tab, Achievements tab, unlock teasers ("???") for
+  tabs, mechanics, agent types, locked generators and the next era. Per-era CSS themes.
+- `tools/sim.js` first version (greedy active-player strategy; reports era times per run).
+
 ## Known issues
 - none yet
 
 ## Balance notes
-- none yet
+- Trade routes were originally multiplicative per level and caused a runaway coin→routes loop (1e270 in
+  minutes). Now additive: 1 + 0.5 × tradeMult × level. Keep level-based effects additive or give them
+  steeper cost growth than effect growth.
+- Sim (no prestige, 4 clicks/s): Bronze 21m, Classical 46m, Medieval 1h03, Industrial 1h15, Atomic 1h55.
+  Needs tuning in Phase 7 (target: Classical within 30–45 min).

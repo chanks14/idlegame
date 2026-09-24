@@ -152,7 +152,7 @@
     const C = IG.CONFIG;
     const k0 = (IG.mods ? IG.mods.synergyMult : 1);
     for (const syn of C.synergies) {
-      const amt = s.run.resources[syn.res];
+      const amt = s.run.produced[syn.res];
       if (!amt || amt.lte(0)) continue;
       const srcEra = C.resources[syn.res].era;
       if (srcEra > s.run.era) continue;
