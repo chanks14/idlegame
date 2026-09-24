@@ -84,7 +84,7 @@
   }
 
   function matches(e, genId, gen, res) {
-    if (e.gen !== undefined && e.gen !== genId) return false;
+    if (e.gen !== undefined && (Array.isArray(e.gen) ? e.gen.indexOf(genId) < 0 : e.gen !== genId)) return false;
     if (e.era !== undefined) {
       if (Array.isArray(e.era) ? e.era.indexOf(gen.era) < 0 : e.era !== gen.era) return false;
     }

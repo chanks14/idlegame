@@ -35,6 +35,14 @@
       const each = n > 0 ? total.div(n) : IG.D(g.produces[r]).mul(IG.Mods.get().gen[id][r]);
       h += IG.icons.html(r, 'ic-sm') + ' ' + IG.fmtRate(each) + ' each · ' + IG.fmtRate(total) + ' total<br>';
     }
+    if (g.consumes) {
+      for (const inp in g.consumes) {
+        h += 'Consumes ' + g.consumes[inp] + ' ' + C.resources[inp].name + ' per unit produced';
+        const eff = IG.Prod.cache.converterEff[inp];
+        if (eff !== undefined && eff < 0.999) h += ' <span class="no">(running at ' + IG.fmtPct(eff) + ' — not enough ' + C.resources[inp].name + ')</span>';
+        h += '<br>';
+      }
+    }
     h += 'Upgrade multiplier: ' + IG.fmtMult(IG.D(C.genUpgrades.mult).pow(s.run.gens[id].up));
     return h;
   }

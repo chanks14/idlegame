@@ -20,7 +20,10 @@
 
   function targetName(e) {
     const C = IG.CONFIG;
-    if (e.gen) return C.generators[e.gen] ? C.generators[e.gen].name + ' output' : e.gen;
+    if (e.gen) {
+      const ids = Array.isArray(e.gen) ? e.gen : [e.gen];
+      return ids.map((g) => (C.generators[g] ? C.generators[g].name : g)).join(' & ') + ' output';
+    }
     let parts = [];
     if (e.era !== undefined) {
       const eras = Array.isArray(e.era) ? e.era : [e.era];

@@ -108,6 +108,11 @@
       titleCard('The Long Night', 'Cities fall silent and the names are forgotten. You remember. +' + IG.fmtInt(d.gain) + ' points.', 'prestige');
       setTimeout(() => { const c = centerOf('#pp-chip'); burst(c.x, c.y, 140, '#c8a8ff'); }, 600);
     });
+    IG.Bus.on('frontWon', (d) => {
+      IG.UI.toast('Victory at <b>' + IG.dom.esc(d.front.name) + '</b> — ' + IG.fmtInt(d.worlds) + ' worlds taken', 'gold');
+      const c = centerOf('.war-banner') ; burst(c.x, c.y, 70, '#ffd76a');
+    });
+    IG.Bus.on('frontLost', (d) => { IG.UI.toast('The line at <b>' + IG.dom.esc(d.front.name) + '</b> collapses — ' + IG.fmtInt(d.worlds) + ' worlds lost', 'bad'); });
     IG.Bus.on('milestone', (d) => { const c = centerOf(d && d.sel ? d.sel : '#era-card'); burst(c.x, c.y, 60); });
     IG.Bus.on('achievement', () => { const c = centerOf('#toasts'); burst(c.x, c.y - 20, 50, '#ffd76a'); });
   }

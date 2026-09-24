@@ -40,7 +40,7 @@
     panel.appendChild(el('div', { class: 'dev-row' }, [el('span', { text: 'Prestige pts' }),
       btn('+10', () => grantPP(10)), btn('+100', () => grantPP(100)), btn('+10k', () => grantPP(10000))]));
     panel.appendChild(el('div', { class: 'dev-row' }, [el('span', { text: 'Misc' }),
-      btn('Meet milestone', () => meetMilestone()), btn('Research era', () => researchAll()), btn('+Worlds', () => { if (IG.Expansion) IG.Expansion.devAddWorlds(1000); })]));
+      btn('Meet milestone', () => meetMilestone()), btn('Research era', () => researchAll()), btn('+Worlds', () => { if (IG.Expansion) IG.Expansion.devAddWorlds(1000); }), btn('Win front', () => { if (IG.War) IG.War.devWin(); })]));
     panel.appendChild(el('div', { class: 'dev-row' }, [el('span', { text: 'Disable' }),
       btn('Leave dev mode', () => { s.meta.devMode = false; s.meta.devMult = 1; IG.Mods.dirty = true; toggle(); IG.UI.toast('Dev mode off.'); })]));
   }

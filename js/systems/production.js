@@ -4,7 +4,7 @@
   const IG = globalThis.IG || (globalThis.IG = {});
   const D = IG.D;
 
-  const cache = { rates: {}, gross: {}, genRates: {} };
+  const cache = { rates: {}, gross: {}, genRates: {}, converterEff: {} };
 
   function cfg(id) { return IG.CONFIG.generators[id]; }
   function st(id) { return IG.state.run.gens[id]; }
@@ -124,24 +124,53 @@
     const rates = {}, gross = {};
     for (const r in C.resources) { rates[r] = D(0); gross[r] = D(0); }
     const genRates = {};
+    const consumers = [];
     for (const id in C.generators) {
       const n = s.run.gens[id].n;
       if (n <= 0) continue;
       const g = C.generators[id];
       const per = mods.gen[id];
       const out = {};
-      for (const r in g.produces) {
-        const v = D(g.produces[r] * n).mul(per[r]).mul(dyn.era[g.era]).mul(dyn.res[r]);
-        out[r] = v;
-        gross[r] = gross[r].add(v);
-      }
+      for (const r in g.produces) out[r] = D(g.produces[r] * n).mul(per[r]).mul(dyn.era[g.era]).mul(dyn.res[r]);
       genRates[id] = out;
+      if (g.consumes) { consumers.push(id); continue; }
+      for (const r in out) gross[r] = gross[r].add(out[r]);
     }
     // external producers (worlds, war chain) add into gross through hooks
     for (const fn of Prod.extraProducers) fn(s, gross, dyn, mods);
+    // converters: output limited by availability of their input (stockpile or this tick's production)
+    const used = {};
+    if (consumers.length) {
+      const demand = {};
+      for (const id of consumers) {
+        const g = C.generators[id];
+        for (const inp in g.consumes) {
+          for (const r in genRates[id]) demand[inp] = (demand[inp] || D(0)).add(genRates[id][r].mul(g.consumes[inp]));
+        }
+      }
+      const eff = {};
+      for (const inp in demand) {
+        if (demand[inp].lte(0)) { eff[inp] = 1; continue; }
+        const stock = s.run.resources[inp];
+        eff[inp] = stock.gte(demand[inp]) ? 1 : Math.min(1, gross[inp].div(demand[inp]).toNumber());
+        used[inp] = demand[inp].mul(eff[inp]);
+      }
+      for (const id of consumers) {
+        const g = C.generators[id];
+        let e = 1;
+        for (const inp in g.consumes) e = Math.min(e, eff[inp]);
+        for (const r in genRates[id]) {
+          if (e < 1) genRates[id][r] = genRates[id][r].mul(e);
+          gross[r] = gross[r].add(genRates[id][r]);
+        }
+      }
+      cache.converterEff = eff;
+    }
     for (const r in C.resources) {
-      const drain = dyn.drains[r];
-      rates[r] = drain ? gross[r].sub(drain) : gross[r];
+      let net = gross[r];
+      if (dyn.drains[r]) net = net.sub(dyn.drains[r]);
+      if (used[r]) net = net.sub(used[r]);
+      rates[r] = net;
     }
     cache.rates = rates;
     cache.gross = gross;

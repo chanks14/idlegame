@@ -110,6 +110,7 @@ function manage(res) {
   if (IG.Compute.unlocked() && IG.Compute.totalShare() < 0.99) IG.Compute.balance();
   if (IG.Mega.unlocked() && !s.run.mega.active) { const m = IG.Mega.cheapestAvailable(); if (m) IG.Mega.start(m); }
   if (IG.Expansion && IG.Expansion.active()) IG.Expansion.buildShips('max', true);
+  if (IG.War && IG.War.active()) IG.War.autoAllocate();
   buyGenerators(res);
 }
 

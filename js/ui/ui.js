@@ -72,6 +72,8 @@
     const C = IG.CONFIG, era = IG.state.run.era;
     const list = unlockedResources().filter((r) => {
       const d = C.resources[r];
+      if (d.noHeader) return false;
+      if (d.headerUntil !== undefined && era > d.headerUntil) return false;
       return d.era >= era - 1 || d.pinned;
     });
     return list;
@@ -151,7 +153,7 @@
       refs.advBtn = null;
       const nextE = C.eras[s.run.era + 1];
       if (e.milestone && e.milestone.length) {
-        const head = e.autoAdvance ? e.autoAdvanceText : nextE ? 'To reach the ' + nextE.name + ':' : 'Milestone:';
+        const head = e.autoAdvance ? e.autoAdvanceText : nextE ? 'To reach the ' + nextE.name + ':' : (e.milestoneText || 'Milestone:');
         card.appendChild(el('div', { class: 'ms-head', text: head }));
         card.appendChild(refs.msList);
         refs.msRows = IG.Eras.progress().map((p) => {

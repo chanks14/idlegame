@@ -28,13 +28,16 @@
       food:      { name: 'Food',      era: 0, color: '#d9a55b', legacy: 1,    desc: 'Roots, game and grain. The first currency of survival.' },
       stone:     { name: 'Stone',     era: 0, color: '#a39a8c', legacy: 2,    desc: 'Flint and fieldstone, shaped by patient hands.' },
       bronze:    { name: 'Bronze',    era: 1, color: '#d08a3a', legacy: 60,   desc: 'Copper and tin, wedded in fire.' },
-      knowledge: { name: 'Knowledge', era: 1, color: '#8fb7e8', legacy: 40, pinned: true, desc: 'Written memory. Spent on research in every later age.' },
+      knowledge: { name: 'Knowledge', era: 1, color: '#8fb7e8', legacy: 40, pinned: true, headerUntil: 6, desc: 'Written memory. Spent on research in every later age.' },
       coin:      { name: 'Coin',      era: 2, color: '#f2d06b', legacy: 3e3,  desc: 'Stamped silver that crosses every border.' },
       faith:     { name: 'Faith',     era: 3, color: '#e7b9ff', legacy: 1e5,  desc: 'Devotion, gathered in stone and song. Fuels the Rites.' },
       energy:    { name: 'Energy',    era: 4, color: '#ffb347', legacy: 3e6,  desc: 'Steam, coal and current. Powers the Grid.' },
       compute:   { name: 'Compute',   era: 5, color: '#5dff9a', legacy: 1e8,  desc: 'Calculation at the speed of lightning.' },
       alloy:     { name: 'Alloy',     era: 6, color: '#7ec8ff', legacy: 1e10, desc: 'Orbital alloys forged in zero gravity.' },
       starmatter: { name: 'Starmatter', era: 7, color: '#c9a0ff', legacy: 1e12, pinned: true, desc: 'The pooled wealth of every claimed world. Builds colony ships.' },
+      materiel:  { name: 'Materiel',  era: 8, color: '#ff8f6b', legacy: 1e14, desc: 'Munitions, armor plate and reactor fuel. Shipyards and barracks turn it into forces.' },
+      warships:  { name: 'Warships',  era: 8, color: '#ff5d5d', legacy: 1e15, noHeader: true, desc: 'Void warships. Each adds to fleet strength; attrition destroys them.' },
+      legions:   { name: 'Legions',   era: 8, color: '#ffb36b', legacy: 1e14, noHeader: true, desc: 'Drop legions that hold captured worlds. Cheaper, weaker, numerous.' },
     },
 
     // ---------------------------------------------------------------- eras
@@ -67,7 +70,8 @@
         milestone: [{ type: 'worlds', count: 20000 }], autoAdvance: true,
         autoAdvanceText: 'The empire grows until something out there notices:' },
       { id: 'war', name: 'Galactic War', theme: 'war',
-        desc: 'First contact. They were never going to share the stars. The war will not end.' },
+        desc: 'First contact. They were never going to share the stars. The war will not end.',
+        milestone: [{ type: 'fronts', count: 25 }], milestoneText: 'Endless war. Each victory reveals a deeper front:' },
     ],
     endText: 'The war has no end. Push the fronts as deep as you can before the Long Night.',
 
@@ -143,6 +147,15 @@
         produces: { knowledge: 2e8 }, cost: { alloy: [2500, 1.15], knowledge: [1e15, 1.12] } },
       tug: { era: 6, name: 'Asteroid Tug', icon: 'tug', desc: 'Drags mountains of metal into orbit.',
         produces: { alloy: 80, stone: 1e12 }, cost: { alloy: [3e4, 1.16], energy: [1e13, 1.12] } },
+      // Galactic War — the military production chain (yards and barracks convert Materiel into forces)
+      foundry: { era: 8, name: 'Arms Foundry', icon: 'foundry', desc: 'Whole continents given over to munitions.',
+        produces: { materiel: 1 }, cost: { starmatter: [5e4, 1.12], alloy: [1e10, 1.1] } },
+      yard: { era: 8, name: 'Void Shipyard', icon: 'yard', desc: 'Orbital slips that launch warships around the clock.',
+        produces: { warships: 0.05 }, consumes: { materiel: 20 }, cost: { materiel: [300, 1.15], starmatter: [3e5, 1.12] } },
+      barracks: { era: 8, name: 'Legion Barracks', icon: 'barracks', desc: 'Drill yards for the drop legions.',
+        produces: { legions: 0.2 }, consumes: { materiel: 2 }, cost: { materiel: [150, 1.14], starmatter: [1e5, 1.12] } },
+      forge_world: { era: 8, name: 'Forge World', icon: 'forge_world', desc: 'A planet stripped to its core for the war.',
+        produces: { materiel: 30 }, cost: { materiel: [5000, 1.16], starmatter: [3e7, 1.13] } },
     },
 
     // Purchasable ×mult upgrades unlocked at owned-count thresholds (per generator).
@@ -318,6 +331,35 @@
         desc: 'Each world a forge.', effects: [{ type: 'worldOutput', mult: 1.4 }] },
       integration: { era: 7, tier: 4, name: 'Imperial Integration', cost: { starmatter: [1e5, 4] }, maxLevel: 10, prereq: ['orbital_habitats'],
         desc: 'Colonies feed the old industries of the cradle.', effects: [{ type: 'worldBonus', add: 0.005 }] },
+      // ---- Galactic War (repeatable military tech; enemies escalate forever, so do you)
+      admiralty: { era: 8, tier: 0, name: 'Admiralty', cost: { materiel: 200 }, desc: 'A command staff for a war without end. Unlocks Admiral agents.',
+        effects: [{ type: 'unlock', key: 'agent:admiral' }, { type: 'fleetPower', mult: 1.25 }] },
+      war_economy: { era: 8, tier: 0, name: 'War Economy', cost: { materiel: [800, 3] }, maxLevel: 25,
+        desc: 'Every factory retooled for the front.', effects: [{ type: 'prod', gen: ['yard', 'barracks'], mult: 1.4 }] },
+      mobilization: { era: 8, tier: 0, name: 'Total Mobilization', cost: { starmatter: [2e6, 3] }, maxLevel: 25,
+        desc: 'The whole empire forges weapons.', effects: [{ type: 'prod', res: 'materiel', mult: 1.5 }] },
+      lances: { era: 8, tier: 1, name: 'Lance Batteries', cost: { materiel: [2000, 3] }, maxLevel: 40, prereq: ['admiralty'],
+        desc: 'Spinal guns that split moons.', effects: [{ type: 'fleetPower', mult: 1.5 }] },
+      ablative: { era: 8, tier: 1, name: 'Ablative Armor', cost: { materiel: [3000, 3.5] }, maxLevel: 15, prereq: ['admiralty'],
+        desc: 'Hulls that burn away instead of breaking.', effects: [{ type: 'attrition', mult: 0.88 }] },
+      keels: { era: 8, tier: 1, name: 'Dreadnought Keels', cost: { materiel: [5000, 4] }, maxLevel: 10, prereq: ['war_economy'],
+        desc: 'Bigger ships, bigger guns.', effects: [{ type: 'unitPower', unit: 'warship', mult: 2 }] },
+      drop_armor: { era: 8, tier: 1, name: 'Drop Armor', cost: { materiel: [4000, 4] }, maxLevel: 10, prereq: ['war_economy'],
+        desc: 'Legions that survive orbital insertion under fire.', effects: [{ type: 'unitPower', unit: 'legion', mult: 2 }] },
+      fleet_logistics: { era: 8, tier: 2, name: 'Fleet Logistics', cost: { materiel: [1e4, 4] }, maxLevel: 10, prereq: ['lances'],
+        desc: 'Supply lines that keep offensives moving.', effects: [{ type: 'frontSpeed', mult: 1.2 }] },
+      occupation: { era: 8, tier: 2, name: 'Occupation Doctrine', cost: { materiel: 2e4, starmatter: 1e8 }, prereq: ['drop_armor'],
+        desc: 'Conquered worlds are held, not razed.', effects: [{ type: 'captureMult', mult: 2 }] },
+      scorched: { era: 8, tier: 2, name: 'Scorched Retreat', cost: { materiel: 3e4, starmatter: 2e8 }, prereq: ['ablative'],
+        desc: 'Evacuate and burn what cannot be held.', effects: [{ type: 'lossMult', mult: 0.5 }] },
+      swarm_burners: { era: 8, tier: 3, name: 'Swarm Burners', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['lances'],
+        desc: 'Incendiary fields that cook Vorrhal broods.', effects: [{ type: 'counter', faction: 'vorrhal', mult: 1.8 }] },
+      choir_breakers: { era: 8, tier: 3, name: 'Choir Breakers', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['lances'],
+        desc: 'Resonance torpedoes that shatter pale hulls.', effects: [{ type: 'counter', faction: 'ashen', mult: 1.8 }] },
+      hullfoam: { era: 8, tier: 3, name: 'Hullfoam Sealant', cost: { materiel: [1.5e4, 3.5] }, maxLevel: 15, prereq: ['ablative'],
+        desc: 'Self-sealing hulls that deny Thessik corrosion.', effects: [{ type: 'counter', faction: 'thessik', mult: 1.8 }] },
+      disruptors: { era: 8, tier: 3, name: 'Disruptor Arrays', cost: { materiel: [2e4, 3.5] }, maxLevel: 15, prereq: ['fleet_logistics'],
+        desc: 'Logic-scrambling beams. The Hollow Lattice has no defense against them.', effects: [{ type: 'fleetPower', mult: 1.2 }, { type: 'counter', faction: 'lattice', mult: 2.5 }] },
     },
 
     // Display names for {type:'unlock'} keys
@@ -434,9 +476,48 @@
       galaxy: { stars: 7000, arms: 4, seed: 7331, fullAtWorlds: 1e9 },
     },
 
+    // ---------------------------------------------------------------- Galactic War
+    // Each tick per front: committed P = fleet × share × counters; enemy E regenerates toward Emax.
+    //   progress += speed × frontSpeed × (P − E)/(P + E) × dt        (losing side pushes at retreatSpeed)
+    //   player attrition (strength/s) = E × enemyLethality × lethality trait × attrition mod
+    //   enemy attrition (strength/s)  = P × playerLethality
+    //   Emax = base × strength trait × depthGrowth^depth × timeGrowth^(minutes at war × growth trait) × enemyStrength
+    war: {
+      unitPower: { warship: 12, legion: 1 },
+      baseEnemy: 3000,
+      depthGrowth: 3,
+      timeGrowthPerMin: 1.035,
+      regenPerSec: 0.04,
+      floorFrac: 0.05,          // enemy strength never drops below this fraction of Emax
+      playerLethality: 0.08,
+      enemyLethality: 0.02,
+      advanceSpeed: 1 / 120,    // progress per second at total superiority (full front = 1.0)
+      retreatSpeed: 1 / 240,
+      graceSeconds: 300,        // after first contact the enemy does not push for this long
+      captureBase: 500,         // worlds captured per victory: captureBase × captureGrowth^depth × captureMult
+      captureGrowth: 1.35,
+      lossFrac: 0.02,           // worlds lost per defeat: max(lossMin, lossFrac × worlds) × lossMult
+      lossMin: 50,
+      coreFloor: 0.5,           // the empire never drops below this share of the worlds held at first contact
+      lullSeconds: 120,         // after a collapse the enemy regroups and cannot push that front for a while
+      lullEnemyFrac: 0.5,       // ...and its strength on that front falls to this fraction
+      factions: {
+        vorrhal: { name: 'Vorrhal Brood', color: '#9be15d', fronts: 2, traits: { growth: 1.6 },
+          desc: 'A hive-swarm that breeds faster than it can be killed.', traitText: 'Grows fast (escalation ×1.6).' },
+        ashen: { name: 'Ashen Choir', color: '#e6e1d6', fronts: 1, traits: { strength: 2.5, growth: 0.8 },
+          desc: 'Pale silent ships that shrug off fire.', traitText: 'High defense (strength ×2.5), slow to grow.' },
+        thessik: { name: 'Thessik Reach', color: '#ff7a3d', fronts: 1, traits: { lethality: 2.2 },
+          desc: 'Raiders whose weapons eat hulls from within.', traitText: 'Causes heavy attrition (×2.2).' },
+        lattice: { name: 'Hollow Lattice', color: '#5ad1ff', fronts: 1, traits: { regen: 3, weakTo: 'disruptors' },
+          desc: 'A machine intelligence that rebuilds as it dies.', traitText: 'Regenerates ×3; weak to Disruptor Arrays.' },
+      },
+      frontNames: ['Veil', 'Ember Reach', 'Cinder Gate', 'the Shoals', 'Pale March', 'Hollowdeep', 'the Sunder', 'Graveward',
+        'Ashfall', 'the Maw', 'Thornspire', 'Lantern Rift', 'Deepwatch', 'Blackwater', 'the Weir', 'Starfall'],
+    },
+
     // ---------------------------------------------------------------- agents
     agents: {
-      baseInterval: { forage: 1, gen: 3, research: 5, trade: 4, rites: 3, grid: 5, compute: 10, mega: 5, ships: 2 },
+      baseInterval: { forage: 1, gen: 3, research: 5, trade: 4, rites: 3, grid: 5, compute: 10, mega: 5, ships: 2, warfleet: 3 },
       speedPerLevel: 0.2,        // interval / (1 + speedPerLevel × (level − 1))
       bulkEvery: 3,              // +1 bulk action per this many levels
       forageClicksPerLevel: 2,   // forage clicks per action = level × this
@@ -458,8 +539,10 @@
           recruit: { compute: [5000, 5] }, upgrade: { compute: [2500, 2.6] }, desc: 'Technocrats of the planetary state.' },
         navigator: { name: 'Navigator', era: 6, unlock: 'agent:navigator', areas: ['gen5', 'gen6', 'mega', 'ships'],
           recruit: { alloy: [5000, 5] }, upgrade: { alloy: [2500, 2.6] }, desc: 'Pilots who trace paths between worlds.' },
-        governor: { name: 'Governor', era: 7, unlock: 'agent:governor', areas: ['ships', 'research', 'gen6'],
+        governor: { name: 'Governor', era: 7, unlock: 'agent:governor', areas: ['ships', 'research', 'gen6', 'gen8'],
           recruit: { starmatter: [2000, 5] }, upgrade: { starmatter: [1000, 2.6] }, desc: 'Stewards of a thousand colonies.' },
+        admiral: { name: 'Admiral', era: 8, unlock: 'agent:admiral', areas: ['warfleet', 'gen8', 'ships'],
+          recruit: { materiel: [2000, 5] }, upgrade: { materiel: [1000, 2.6] }, desc: 'Commanders who have never known peace.' },
       },
       areas: {
         forage: { name: 'Foraging', kind: 'forage', desc: 'Forages repeatedly.' },
@@ -470,6 +553,8 @@
         gen4: { name: 'Industrial works', kind: 'gen', era: 4, desc: 'Buys Industrial generators and upgrades.' },
         gen5: { name: 'Atomic works', kind: 'gen', era: 5, desc: 'Buys Atomic generators and upgrades.' },
         gen6: { name: 'Spacefaring works', kind: 'gen', era: 6, desc: 'Buys Spacefaring generators and upgrades.' },
+        gen8: { name: 'War industry', kind: 'gen', era: 8, desc: 'Buys foundries, shipyards and barracks.' },
+        warfleet: { name: 'Fleet command', kind: 'warfleet', minEra: 8, desc: 'Allocates the fleet across fronts in proportion to enemy strength.' },
         research: { name: 'Research', kind: 'research', desc: 'Researches the cheapest available tech.' },
         trade: { name: 'Trade routes', kind: 'trade', mech: 'mech:trade', desc: 'Extends the cheapest trade route.' },
         rites: { name: 'Rites', kind: 'rites', mech: 'mech:rites', desc: 'Keeps rites burning when faith allows.' },
@@ -650,6 +735,12 @@
         { id: 'fleet_in_being', name: 'Ark Armada', desc: 'Launch 100 colony ships in one run.', cond: { type: 'ships', count: 100 } },
         { id: 'terraformer', name: 'Terraformer', desc: 'Research Terraforming to level 5.', cond: { type: 'habTech', level: 5 } },
         { id: 'star_wealth', name: 'Star-Wealth', desc: 'Produce 1B Starmatter in one run.', cond: { type: 'res', res: 'starmatter', amount: 1e9 } },
+        { id: 'first_blood', name: 'First Blood', desc: 'Win a front.', cond: { type: 'fronts', count: 1 } },
+        { id: 'warlord', name: 'Warlord', desc: 'Win 10 fronts (lifetime).', cond: { type: 'fronts', count: 10 } },
+        { id: 'endless_war', name: 'Endless War', desc: 'Win 100 fronts (lifetime).', cond: { type: 'fronts', count: 100 } },
+        { id: 'setback', name: 'Setback', desc: 'Lose a front.', cond: { type: 'frontsLost', count: 1 } },
+        { id: 'armada', name: 'Armada', desc: 'Field a fleet with 1B strength.', cond: { type: 'fleet', amount: 1e9 } },
+        { id: 'beyond_reckoning', name: 'Beyond Reckoning', desc: 'Hold or produce a quantity beyond 1e308.', cond: { type: 'bigNumber' } },
         { id: 'first_contact', name: 'First Contact', desc: 'Rule 20,000 worlds and meet the others.', cond: { type: 'era', era: 8 } },
         { id: 'long_night', name: 'The Long Night', desc: 'Prestige for the first time.', cond: { type: 'prestiges', count: 1 } },
         { id: 'cycles', name: 'Cycles', desc: 'Prestige 5 times.', cond: { type: 'prestiges', count: 5 } },
@@ -716,6 +807,17 @@
         'Punch cards stack to the ceiling of the census bureau.',
         'A scientist dreams of the stars and wakes to calculate trajectories.',
         'Somewhere, a finger rests beside a button and does not press it.',
+      ],
+      war: [
+        'The Vorrhal hatcheries darken another system.',
+        'Fleets burn in silence between the stars.',
+        'A world goes dark on the tactical map.',
+        'Conscription reaches the outer colonies.',
+        'Memorial pyres burn on a hundred worlds.',
+        'The Ashen Choir sings, and whole squadrons fall silent.',
+        'The foundries never sleep. Neither do you.',
+        'A Lattice node reassembles itself from the wreckage.',
+        'Thessik raiders leave only corroded hulks behind.',
       ],
       interstellar: [
         'An ark-ship drops out of the dark above a blue world.',

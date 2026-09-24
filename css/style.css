@@ -346,3 +346,26 @@ b.gold, .gold { color: var(--gold); }
 .planet-table .ic-lg { width: 22px; height: 22px; }
 .res-chip.extra .amt { white-space: nowrap; }
 @media (max-width: 1300px) { .galaxy-layout { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------- war */
+.war-banner .es-val { font-size: 24px; }
+.war-grace { padding: 8px 12px; border: 1px dashed var(--accent2); border-radius: var(--radius); margin-bottom: 10px; color: var(--gold); }
+.war-layout { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(0, 1.1fr); gap: 12px; align-items: start; }
+.war-left, .war-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.mech-title .spacer { flex: 1; }
+.fleet-stats { font-size: 13px; line-height: 1.7; }
+.front-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.front { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--fc); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.front .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.front .ic { color: var(--fc); }
+.front input[type=range] { flex: 1; }
+.front-bar { display: flex; align-items: center; height: 10px; background: rgba(0,0,0,.45); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.fb-half { flex: 1; height: 100%; position: relative; }
+.fb-half:first-child { display: flex; justify-content: flex-end; }
+.fb-left { height: 100%; width: 0; background: linear-gradient(90deg, var(--fc), #7a1a14); transition: width .3s linear; }
+.fb-right { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 8px var(--glow); transition: width .3s linear; }
+.fb-mid { width: 2px; height: 100%; background: var(--text); opacity: .6; }
+.faction-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.faction-item { display: flex; gap: 8px; align-items: center; padding: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--fc); }
+.faction-item b { color: var(--fc); }
+@media (max-width: 1300px) { .war-layout { grid-template-columns: 1fr; } }

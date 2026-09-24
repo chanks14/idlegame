@@ -116,7 +116,7 @@
       left -= k;
     }
     e.cohorts = e.cohorts.filter((c) => c.n > 0);
-    recount();
+    if (recount().total < 1) { e.matured[X().home] = 1; recount(); }
     return want - Math.max(0, left);
   }
 

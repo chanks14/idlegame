@@ -8,7 +8,7 @@
 - [x] 3. Prestige and the Immortal's Power Tree.
 - [x] 4. Interstellar Age: planet types, habitability, cohorts, maturation, colony ships, galaxy canvas,
        20,000-world transition.
-- [ ] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
+- [x] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
        military tech.
 - [ ] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
 - [ ] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
@@ -66,6 +66,23 @@
 - Galaxy tab: procedural 4-arm spiral (7,000 stars, seeded), territory spreads from the homeworld by claim
   order (log scale of worlds), glow layers cached offscreen, frontier shimmer, ark sparks in flight.
 - 20,000 worlds → First Contact → Galactic War era (war systems in Phase 5). 10 new achievements.
+
+### Phase 5 — Galactic War
+- New resources: Materiel, Warships, Legions. War generators: Arms Foundry, Forge World (materiel),
+  Void Shipyard and Legion Barracks are *converters* (`consumes` in config): output limited by materiel
+  stock/production, consumption shown as a drain. Converter efficiency shown in tooltips / War tab.
+- `js/systems/war.js`: 4 original factions with numeric traits — Vorrhal Brood (fast growth, 2 fronts),
+  Ashen Choir (high defense), Thessik Reach (high attrition), Hollow Lattice (regenerates, weak to
+  Disruptors). Fronts: enemy regenerates toward Emax (depth × time escalation), Lanchester-like attrition
+  both ways, progress ±1, victory captures a block of worlds as new cohorts and opens a deeper front,
+  defeat loses a block of worlds. 5-minute grace after first contact, per-front lull after a collapse,
+  core-world floor (50% of worlds at first contact). All math uses exact/exponential forms → stable for
+  large offline steps (8 h offline ≈ 0.8 s).
+- Allocation sliders per front, Auto-allocate (proportional to need) and Even split; Admiral agents
+  ("Fleet command" area) auto-allocate. 16 military techs (weapons, armor, production, logistics,
+  occupation, scorched retreat, faction counters incl. Disruptors).
+- War tab: prominent empire totals, fleet panel, fronts, galaxy view with faction territories and
+  glowing/dashed front arcs. Header shows worlds + fleet. 6 war achievements.
 
 ## Known issues
 - none yet

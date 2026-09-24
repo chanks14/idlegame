@@ -12,8 +12,9 @@
       case 'res': return 'Hold ' + IG.fmt(req(c)) + ' ' + C.resources[c.res].name;
       case 'research': return 'Research ' + C.research[c.id].name;
       case 'gen': return 'Own ' + c.count + ' ' + C.generators[c.gen].name;
-      case 'mega': return 'Complete ' + C.megaprojects[c.id].name;
+      case 'mega': return 'Complete the ' + C.megaprojects.list[c.id].name;
       case 'worlds': return 'Rule ' + IG.fmtInt(c.count) + ' worlds';
+      case 'fronts': return 'Win ' + c.count + ' fronts this run';
       default: return '?';
     }
   }
@@ -42,6 +43,7 @@
         case 'gen': frac = Math.min(1, s.run.gens[c.gen].n / c.count); break;
         case 'mega': frac = IG.Mega ? IG.Mega.fraction(c.id) : 0; break;
         case 'worlds': frac = IG.Expansion ? Math.min(1, IG.Expansion.totalWorlds() / c.count) : 0; break;
+        case 'fronts': frac = s.run.war ? Math.min(1, s.run.war.won / c.count) : 0; break;
       }
       return { label: condLabel(c), frac, done: frac >= 1 };
     });
