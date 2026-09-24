@@ -6,7 +6,7 @@
 - [x] 2. Eras 2–7: generators, research, agents, buy multipliers, achievements, stats, event log, unlock
        teasers, era color themes.
 - [x] 3. Prestige and the Immortal's Power Tree.
-- [ ] 4. Interstellar Age: planet types, habitability, cohorts, maturation, colony ships, galaxy canvas,
+- [x] 4. Interstellar Age: planet types, habitability, cohorts, maturation, colony ships, galaxy canvas,
        20,000-world transition.
 - [ ] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
        military tech.
@@ -53,6 +53,20 @@
 - New run bonuses are applied through `IG.Game.onNewRun` hooks.
 - 5 prestige/tree achievements. Sim now prestiges like a reasonable player (gain ≥ 2× lifetime, or stalled).
 
+### Phase 4 — Interstellar Age
+- `js/systems/expansion.js`: 8 planet types (Garden, Ocean, Desert, Ice, Volcanic, Barren, Gas Giant,
+  Asteroid Field) with base habitability, weight and yield. Colonies (hab ≥ 0.5) vs outposts (floor 15%).
+- Worlds are cohorts `{type, t(bucket), n}`; maturity ramps 5% → 100% over `matureSeconds / maturation`;
+  matured cohorts merge into one pool per type (cohort count stays ≈ types × buckets, tested at 3M worlds).
+- Colony arks: cost Starmatter + Alloy, travel time, yield worlds per ark, deterministic type split with
+  fractional carry. Ships in flight are merged into ≤ flightBucket-second groups.
+- Worlds produce Starmatter (extra producer) and give +2%/world to every older era (dynamic multiplier).
+- 20 Interstellar techs (many repeatable): drive, hulls, seeding, terraforming, cryo-berths, per-planet
+  habitability, stellar industry, imperial integration. Governor agent + "Colony ships" automation area.
+- Galaxy tab: procedural 4-arm spiral (7,000 stars, seeded), territory spreads from the homeworld by claim
+  order (log scale of worlds), glow layers cached offscreen, frontier shimmer, ark sparks in flight.
+- 20,000 worlds → First Contact → Galactic War era (war systems in Phase 5). 10 new achievements.
+
 ## Known issues
 - none yet
 
@@ -65,3 +79,6 @@
 - After prestige, global multipliers compress era times ~linearly; run 2+ currently fly through eras.
   Phase 7 must make base era times grow steeply with era index (bootstrap-generator cost growth, bigger
   milestones) and keep tree multipliers moderate.
+- Interstellar: repeatable multiplicative techs with cheap geometric costs made growth super-exponential
+  (20k worlds in 15 min). Keep Σ ln(effect)/ln(costGrowth) over repeatables well below 1. With a strong
+  dev-jump economy the probe now reaches 20k worlds in ~45 min; verify with natural runs in Phase 7.

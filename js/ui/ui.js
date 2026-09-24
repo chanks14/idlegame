@@ -77,9 +77,13 @@
     return list;
   }
 
+  // Extra header chips for non-resource totals (worlds, fleet): {id, icon, color, show(), value(), sub(), tip()}
+  const headerExtras = [];
+
   function buildHeader() {
     const list = headerResources();
-    const key = list.join(',');
+    const extras = headerExtras.filter((x) => x.show());
+    const key = list.join(',') + '|' + extras.map((x) => x.id).join(',');
     if (key !== resKey) {
       resKey = key;
       clear(refs.resBar);
@@ -93,7 +97,16 @@
         refs.resBar.appendChild(chip);
         refs.resChips[r] = { amt, rate };
       }
+      refs.extraChips = [];
+      for (const x of extras) {
+        const amt = el('span', { class: 'amt' });
+        const rate = el('span', { class: 'rate' });
+        const chip = el('div', { class: 'res-chip extra', style: { '--rc': x.color }, tip: x.tip }, [IG.icons.node(x.icon), el('div', { class: 'res-vals' }, [amt, rate])]);
+        refs.resBar.appendChild(chip);
+        refs.extraChips.push({ x, amt, rate });
+      }
     }
+    for (const c of refs.extraChips || []) { setText(c.amt, c.x.value()); setText(c.rate, c.x.sub ? c.x.sub() : ''); }
     const s = IG.state;
     for (const r in refs.resChips) {
       setText(refs.resChips[r].amt, IG.fmt(s.run.resources[r]));
@@ -134,9 +147,12 @@
       card.appendChild(el('div', { class: 'era-title' }, [IG.icons.node('era_' + e.id), el('span', { text: e.name })]));
       card.appendChild(el('div', { class: 'era-desc', text: e.desc }));
       refs.msList = el('div', { class: 'ms-list' });
-      if (IG.Eras.hasNext()) {
-        const nextE = C.eras[s.run.era + 1];
-        card.appendChild(el('div', { class: 'ms-head', text: e.autoAdvance ? e.autoAdvanceText : 'To reach the ' + nextE.name + ':' }));
+      refs.msRows = [];
+      refs.advBtn = null;
+      const nextE = C.eras[s.run.era + 1];
+      if (e.milestone && e.milestone.length) {
+        const head = e.autoAdvance ? e.autoAdvanceText : nextE ? 'To reach the ' + nextE.name + ':' : 'Milestone:';
+        card.appendChild(el('div', { class: 'ms-head', text: head }));
         card.appendChild(refs.msList);
         refs.msRows = IG.Eras.progress().map((p) => {
           const bar = el('div', { class: 'bar-fill' });
@@ -145,16 +161,13 @@
           refs.msList.appendChild(row);
           return { row, bar, lbl };
         });
-        if (!e.autoAdvance) {
-          refs.advBtn = el('button', { class: 'btn primary advance', on: { click: () => IG.Eras.advance() } },
-            'Advance to the ' + nextE.name);
-          card.appendChild(refs.advBtn);
-        } else refs.advBtn = null;
-      } else {
-        refs.msRows = [];
-        refs.advBtn = null;
-        card.appendChild(el('div', { class: 'ms-head muted', text: C.endText || 'The road beyond is shrouded. More ages await.' }));
       }
+      if (nextE && !e.autoAdvance) {
+        refs.advBtn = el('button', { class: 'btn primary advance', on: { click: () => IG.Eras.advance() } },
+          'Advance to the ' + nextE.name);
+        card.appendChild(refs.advBtn);
+      }
+      if (!nextE) card.appendChild(el('div', { class: 'ms-head muted', text: C.endText || 'The road beyond is shrouded. More ages await.' }));
     }
     if (refs.msRows && refs.msRows.length) {
       const prog = IG.Eras.progress();
@@ -303,6 +316,6 @@
     IG.dom.refreshTip();
   }
 
-  IG.UI = { registerTab, switchTab, init, refresh, rebuildAll, modal, confirm, toast, current, tabs,
+  IG.UI = { headerExtras, registerTab, switchTab, init, refresh, rebuildAll, modal, confirm, toast, current, tabs,
     markDirty() { dirty = true; }, resetEraCard() { eraKey = ''; }, unlockedResources };
 })();

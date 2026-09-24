@@ -34,6 +34,7 @@
       energy:    { name: 'Energy',    era: 4, color: '#ffb347', legacy: 3e6,  desc: 'Steam, coal and current. Powers the Grid.' },
       compute:   { name: 'Compute',   era: 5, color: '#5dff9a', legacy: 1e8,  desc: 'Calculation at the speed of lightning.' },
       alloy:     { name: 'Alloy',     era: 6, color: '#7ec8ff', legacy: 1e10, desc: 'Orbital alloys forged in zero gravity.' },
+      starmatter: { name: 'Starmatter', era: 7, color: '#c9a0ff', legacy: 1e12, pinned: true, desc: 'The pooled wealth of every claimed world. Builds colony ships.' },
     },
 
     // ---------------------------------------------------------------- eras
@@ -61,8 +62,14 @@
       { id: 'spacefaring', name: 'Spacefaring Age', theme: 'spacefaring',
         desc: 'Humanity climbs out of the gravity well. The sky is no longer a ceiling.',
         milestone: [{ type: 'mega', id: 'ark_yards' }, { type: 'research', id: 'deep_drive' }] },
+      { id: 'interstellar', name: 'Interstellar Age', theme: 'interstellar',
+        desc: 'Ark-ships cross the dark. World by world, humanity becomes a galactic species.',
+        milestone: [{ type: 'worlds', count: 20000 }], autoAdvance: true,
+        autoAdvanceText: 'The empire grows until something out there notices:' },
+      { id: 'war', name: 'Galactic War', theme: 'war',
+        desc: 'First contact. They were never going to share the stars. The war will not end.' },
     ],
-    endText: 'Beyond the Ark Yards lies the dark between stars…',
+    endText: 'The war has no end. Push the fronts as deep as you can before the Long Night.',
 
     // ---------------------------------------------------------------- forage (Stone Age click)
     forage: {
@@ -276,6 +283,41 @@
         desc: 'Thinking in thousands of kilometers.', effects: [{ type: 'megaCost', mult: 0.7 }] },
       deep_drive: { era: 6, tier: 3, name: 'Deep-Space Drive', cost: { knowledge: 1e18, alloy: 5e4 }, prereq: ['zero_g', 'mega_engineering'],
         desc: 'Engines that can cross the gulf between suns.', effects: [{ type: 'prod', res: 'alloy', mult: 2 }] },
+      // ---- Interstellar (many are repeatable: maxLevel + geometric cost)
+      ark_doctrine: { era: 7, tier: 0, name: 'Ark Doctrine', cost: { starmatter: 300 }, desc: 'A creed for the long voyage. Unlocks Governor agents.',
+        effects: [{ type: 'unlock', key: 'agent:governor' }, { type: 'worldOutput', mult: 1.5 }] },
+      survey_net: { era: 7, tier: 0, name: 'Survey Network', cost: { starmatter: 8e4 }, desc: 'Probes find a second world beside every target.',
+        effects: [{ type: 'colonyYield', add: 1 }] },
+      drive: { era: 7, tier: 1, name: 'Drive Efficiency', cost: { starmatter: [2000, 4] }, maxLevel: 10, prereq: ['ark_doctrine'],
+        desc: 'Ships cross the dark faster.', effects: [{ type: 'shipSpeed', mult: 1.3 }] },
+      hulls: { era: 7, tier: 1, name: 'Modular Hulls', cost: { starmatter: [4000, 5] }, maxLevel: 10, prereq: ['ark_doctrine'],
+        desc: 'Colony ships assembled from standard parts.', effects: [{ type: 'shipCost', mult: 0.85 }] },
+      seeding: { era: 7, tier: 1, name: 'Biome Seeding', cost: { starmatter: [3000, 4.5] }, maxLevel: 10, prereq: ['survey_net'],
+        desc: 'Engineered life takes root faster.', effects: [{ type: 'maturation', mult: 1.25 }] },
+      terraform: { era: 7, tier: 2, name: 'Terraforming', cost: { starmatter: [6000, 3.5] }, maxLevel: 20, prereq: ['seeding'],
+        desc: 'Every world grows a little kinder.', effects: [{ type: 'hab', add: 0.05 }] },
+      cryo: { era: 7, tier: 2, name: 'Cryo-berths', cost: { starmatter: [6e5, 8] }, maxLevel: 10, prereq: ['survey_net', 'hulls'],
+        desc: 'Each ark sleeps enough colonists for another world.', effects: [{ type: 'colonyYield', add: 1 }] },
+      orbital_habitats: { era: 7, tier: 2, name: 'Orbital Habitats', cost: { starmatter: 4e4, knowledge: 1e24 }, prereq: ['seeding'],
+        desc: 'Stations make hostile worlds livable.', effects: [{ type: 'hab', add: 0.1 }] },
+      aquaforming: { era: 7, tier: 3, name: 'Aquaforming', cost: { starmatter: [30000.0, 4] }, maxLevel: 5, prereq: ['terraform'],
+        desc: 'Floating cities on endless seas.', effects: [{ type: 'hab', planet: 'ocean', add: 0.1 }] },
+      dune_ecology: { era: 7, tier: 3, name: 'Dune Ecology', cost: { starmatter: [45000.0, 4] }, maxLevel: 5, prereq: ['terraform'],
+        desc: 'Deep aquifers under red sand.', effects: [{ type: 'hab', planet: 'desert', add: 0.1 }] },
+      ice_thaw: { era: 7, tier: 3, name: 'Glacial Thaw', cost: { starmatter: [60000.0, 4] }, maxLevel: 5, prereq: ['terraform'],
+        desc: 'Orbital mirrors warm frozen worlds.', effects: [{ type: 'hab', planet: 'tundra', add: 0.1 }] },
+      thermal_taps: { era: 7, tier: 3, name: 'Thermal Taps', cost: { starmatter: [90000.0, 4] }, maxLevel: 5, prereq: ['terraform'],
+        desc: 'Magma tamed into power and shelter.', effects: [{ type: 'hab', planet: 'volcanic', add: 0.1 }] },
+      gas_skimming: { era: 7, tier: 3, name: 'Gas Skimming', cost: { starmatter: [75000.0, 4] }, maxLevel: 5, prereq: ['orbital_habitats'],
+        desc: 'Scoop-ships dive into giant atmospheres.', effects: [{ type: 'hab', planet: 'gas', add: 0.08 }] },
+      belt_mining: { era: 7, tier: 3, name: 'Belt Mining', cost: { starmatter: [60000.0, 4] }, maxLevel: 5, prereq: ['orbital_habitats'],
+        desc: 'Asteroid fields hollowed into mines.', effects: [{ type: 'hab', planet: 'asteroid', add: 0.08 }] },
+      barren_domes: { era: 7, tier: 3, name: 'Pressure Domes', cost: { starmatter: [60000.0, 4] }, maxLevel: 5, prereq: ['orbital_habitats'],
+        desc: 'Glass and steel over dead rock.', effects: [{ type: 'hab', planet: 'barren', add: 0.08 }] },
+      stellar_industry: { era: 7, tier: 4, name: 'Stellar Industry', cost: { starmatter: [1e5, 6] }, maxLevel: 40, prereq: ['cryo', 'terraform'],
+        desc: 'Each world a forge.', effects: [{ type: 'worldOutput', mult: 1.4 }] },
+      integration: { era: 7, tier: 4, name: 'Imperial Integration', cost: { starmatter: [1e5, 4] }, maxLevel: 10, prereq: ['orbital_habitats'],
+        desc: 'Colonies feed the old industries of the cradle.', effects: [{ type: 'worldBonus', add: 0.005 }] },
     },
 
     // Display names for {type:'unlock'} keys
@@ -284,7 +326,7 @@
       'agent:merchant': 'Merchant agents', 'agent:warden': 'Warden agents', 'agent:industrialist': 'Industrialist agents',
       'agent:administrator': 'Administrator agents', 'agent:navigator': 'Navigator agents', 'agent:admiral': 'Admiral agents',
       'mech:trade': 'Trade Routes', 'mech:rites': 'the Rites', 'mech:grid': 'the Power Grid', 'mech:compute': 'Compute Programs',
-      'mech:mega': 'Megaprojects', 'rite:ascension': 'the Rite of Ascension',
+      'mech:mega': 'Megaprojects', 'rite:ascension': 'the Rite of Ascension', 'agent:governor': 'Governor agents',
       'memory:0': 'Stone Age research at the start of every run', 'memory:1': 'Bronze Age research at the start of every run',
     },
 
@@ -296,6 +338,7 @@
       { res: 'energy', k: 0.4 },
       { res: 'compute', k: 0.4 },
       { res: 'alloy', k: 0.4 },
+      { res: 'starmatter', k: 0.4 },
     ],
 
     // ---------------------------------------------------------------- era mechanics
@@ -361,9 +404,39 @@
       },
     },
 
+    // ---------------------------------------------------------------- Interstellar expansion
+    // World output = baseOutput × max(habitability, outpostFloor) × planet yield × maturity × worldOutput mods.
+    expansion: {
+      planets: {
+        garden:   { name: 'Garden',         hab: 1.0,  weight: 4,  yield: 1.0, color: '#6fd07a' },
+        ocean:    { name: 'Ocean',          hab: 0.8,  weight: 8,  yield: 1.0, color: '#3f8fe0' },
+        desert:   { name: 'Desert',         hab: 0.5,  weight: 12, yield: 1.0, color: '#e0b060' },
+        tundra:   { name: 'Ice',            hab: 0.35, weight: 12, yield: 1.0, color: '#bfe6ff' },
+        volcanic: { name: 'Volcanic',       hab: 0.15, weight: 10, yield: 1.3, color: '#ff6a3a' },
+        barren:   { name: 'Barren',         hab: 0.05, weight: 20, yield: 1.0, color: '#9a948c' },
+        gas:      { name: 'Gas Giant',      hab: 0,    weight: 14, yield: 1.6, color: '#d9a0ff' },
+        asteroid: { name: 'Asteroid Field', hab: 0,    weight: 20, yield: 1.2, color: '#a88a70' },
+      },
+      home: 'garden',
+      colonyThreshold: 0.5,   // habitability ≥ this → colony; below → mining outpost
+      outpostFloor: 0.15,     // outposts always produce at least this fraction
+      habCap: 2.5,
+      baseOutput: 4,          // starmatter/s per matured world at habitability 1.0
+      matureSeconds: 600,     // time to reach full output (before maturation bonuses)
+      startFrac: 0.05,        // output fraction of a freshly claimed world
+      bucketSeconds: 30,      // claim-time bucket size for cohorts
+      shipCost: { starmatter: 1000, alloy: 1e7 },
+      travelSeconds: 90,
+      flightBucket: 5,        // ships launched within this many seconds travel together
+      baseYield: 1,           // worlds claimed per ship
+      worldBonus: 0.02,       // each matured world: +2% to every older era's generators
+      firstContact: 20000,
+      galaxy: { stars: 7000, arms: 4, seed: 7331, fullAtWorlds: 1e9 },
+    },
+
     // ---------------------------------------------------------------- agents
     agents: {
-      baseInterval: { forage: 1, gen: 3, research: 5, trade: 4, rites: 3, grid: 5, compute: 10, mega: 5 },
+      baseInterval: { forage: 1, gen: 3, research: 5, trade: 4, rites: 3, grid: 5, compute: 10, mega: 5, ships: 2 },
       speedPerLevel: 0.2,        // interval / (1 + speedPerLevel × (level − 1))
       bulkEvery: 3,              // +1 bulk action per this many levels
       forageClicksPerLevel: 2,   // forage clicks per action = level × this
@@ -383,8 +456,10 @@
           recruit: { energy: [5000, 5] }, upgrade: { energy: [2500, 2.6] }, desc: 'Owners of mills, mines and men.' },
         administrator: { name: 'Administrator', era: 5, unlock: 'agent:administrator', areas: ['gen4', 'gen5', 'compute', 'mega', 'research'],
           recruit: { compute: [5000, 5] }, upgrade: { compute: [2500, 2.6] }, desc: 'Technocrats of the planetary state.' },
-        navigator: { name: 'Navigator', era: 6, unlock: 'agent:navigator', areas: ['gen5', 'gen6', 'mega'],
+        navigator: { name: 'Navigator', era: 6, unlock: 'agent:navigator', areas: ['gen5', 'gen6', 'mega', 'ships'],
           recruit: { alloy: [5000, 5] }, upgrade: { alloy: [2500, 2.6] }, desc: 'Pilots who trace paths between worlds.' },
+        governor: { name: 'Governor', era: 7, unlock: 'agent:governor', areas: ['ships', 'research', 'gen6'],
+          recruit: { starmatter: [2000, 5] }, upgrade: { starmatter: [1000, 2.6] }, desc: 'Stewards of a thousand colonies.' },
       },
       areas: {
         forage: { name: 'Foraging', kind: 'forage', desc: 'Forages repeatedly.' },
@@ -401,6 +476,7 @@
         grid: { name: 'Power grid', kind: 'grid', mech: 'mech:grid', desc: 'Raises grid sectors while energy allows; cuts power on shortfall.' },
         compute: { name: 'Compute programs', kind: 'compute', mech: 'mech:compute', desc: 'Balances compute across all programs.' },
         mega: { name: 'Megaprojects', kind: 'mega', mech: 'mech:mega', desc: 'Starts the next megaproject when one completes.' },
+        ships: { name: 'Colony ships', kind: 'ships', minEra: 7, desc: 'Builds as many colony ships as stores allow.' },
       },
       names: {  // syllable tables for procedurally generated agent names, by agent era
         first: [['Ukka', 'Tor', 'Mara', 'Ghel', 'Oru', 'Senn', 'Adda', 'Rhu'],
@@ -565,6 +641,16 @@
         { id: 'machine_mind', name: 'Machine Mind', desc: 'Run all three compute programs at once.', cond: { type: 'computeAll' } },
         { id: 'megastructure', name: 'Megastructure', desc: 'Complete a megaproject.', cond: { type: 'mega', count: 1 } },
         { id: 'wonders', name: 'Wonders of the Cradle', desc: 'Complete every megaproject in one run.', cond: { type: 'megaAll' } },
+        { id: 'era7', name: 'Between the Stars', desc: 'Reach the Interstellar Age.', cond: { type: 'era', era: 7 } },
+        { id: 'first_colony', name: 'First Colony', desc: 'Rule 2 worlds.', cond: { type: 'worlds', count: 2 } },
+        { id: 'hundred_worlds', name: 'A Hundred Worlds', desc: 'Rule 100 worlds.', cond: { type: 'worlds', count: 100 } },
+        { id: 'thousand_suns', name: 'A Thousand Suns', desc: 'Rule 1,000 worlds.', cond: { type: 'worlds', count: 1000 } },
+        { id: 'multitude', name: 'Multitude', desc: 'Rule 10,000 worlds.', cond: { type: 'worlds', count: 10000 } },
+        { id: 'diaspora_ach', name: 'Diaspora', desc: 'Rule 100,000 worlds.', cond: { type: 'worlds', count: 100000 } },
+        { id: 'fleet_in_being', name: 'Ark Armada', desc: 'Launch 100 colony ships in one run.', cond: { type: 'ships', count: 100 } },
+        { id: 'terraformer', name: 'Terraformer', desc: 'Research Terraforming to level 5.', cond: { type: 'habTech', level: 5 } },
+        { id: 'star_wealth', name: 'Star-Wealth', desc: 'Produce 1B Starmatter in one run.', cond: { type: 'res', res: 'starmatter', amount: 1e9 } },
+        { id: 'first_contact', name: 'First Contact', desc: 'Rule 20,000 worlds and meet the others.', cond: { type: 'era', era: 8 } },
         { id: 'long_night', name: 'The Long Night', desc: 'Prestige for the first time.', cond: { type: 'prestiges', count: 1 } },
         { id: 'cycles', name: 'Cycles', desc: 'Prestige 5 times.', cond: { type: 'prestiges', count: 5 } },
         { id: 'eternal_return', name: 'Eternal Return', desc: 'Prestige 25 times.', cond: { type: 'prestiges', count: 25 } },
@@ -630,6 +716,15 @@
         'Punch cards stack to the ceiling of the census bureau.',
         'A scientist dreams of the stars and wakes to calculate trajectories.',
         'Somewhere, a finger rests beside a button and does not press it.',
+      ],
+      interstellar: [
+        'An ark-ship drops out of the dark above a blue world.',
+        'The first colonists weep at the sight of an alien dawn.',
+        'A survey drone catalogs ten thousand barren moons.',
+        'Signals from home arrive decades old.',
+        'On a frozen world, a mining station keeps its lights on.',
+        'Terraformers seed the clouds of a young planet.',
+        'Somewhere out there, something is watching back.',
       ],
       spacefaring: [
         'A rocket climbs on a pillar of fire; the whole world watches.',

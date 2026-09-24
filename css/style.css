@@ -329,3 +329,20 @@ b.gold, .gold { color: var(--gold); }
 .pt-node:hover .pt-disc { stroke-width: 3; }
 .transition.prestige { background: radial-gradient(circle, rgba(40,20,70,.7), rgba(0,0,0,.97)); }
 .transition.prestige .tc-title { color: #c8a8ff; text-shadow: 0 0 30px rgba(200,168,255,.6), 0 0 80px #6a3fd0; }
+
+/* ---------------------------------------------------------- galaxy */
+.empire-summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.es { flex: 1; min-width: 150px; background: linear-gradient(160deg, var(--panel2), var(--panel)); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px; }
+.es-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.es-val { font-family: var(--display); font-size: 20px; color: var(--accent); text-shadow: 0 0 10px var(--glow); font-variant-numeric: tabular-nums; }
+.galaxy-layout { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 12px; align-items: start; }
+.galaxy-box { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #03030a; min-height: 280px; box-shadow: 0 0 30px rgba(0,0,0,.6) inset; }
+.galaxy-canvas { display: block; }
+.galaxy-side { display: flex; flex-direction: column; gap: 10px; }
+.ship-btns { margin: 8px 0 6px; }
+.planet-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.planet-table th { color: var(--muted); font-weight: normal; text-align: left; padding: 2px 4px; }
+.planet-table td { padding: 2px 4px; border-bottom: 1px solid rgba(255,255,255,.04); white-space: nowrap; }
+.planet-table .ic-lg { width: 22px; height: 22px; }
+.res-chip.extra .amt { white-space: nowrap; }
+@media (max-width: 1300px) { .galaxy-layout { grid-template-columns: 1fr; } }
