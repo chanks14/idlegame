@@ -74,7 +74,7 @@
     const upBtn = el('button', { class: 'btn up', tip: () => upTip(id), on: { click: (e) => {
       if (IG.Prod.buyUpgrade(id)) IG.Bus.emit('popup', { x: e.clientX, y: e.clientY, text: '×' + IG.CONFIG.genUpgrades.mult, cls: 'gold' });
     } } }, '⬆');
-    const node = el('div', { class: 'gen-card' }, [
+    const node = el('div', { class: 'gen-card', 'data-gen': id }, [
       el('div', { class: 'gen-top', tip: () => genTip(id) }, [IG.icons.node(g.icon || id, 'ic-lg'),
         el('div', { class: 'gen-info' }, [el('div', { class: 'gen-name' }, [el('span', { text: g.name }), count]), rate])]),
       el('div', { class: 'gen-actions' }, [btn, upBtn]),

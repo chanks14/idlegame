@@ -78,7 +78,7 @@
     const root = document.getElementById('transition');
     if (!root) return;
     root.className = 'transition show ' + (cls || '');
-    root.innerHTML = '<div class="tc-inner"><div class="tc-title"></div><div class="tc-sub"></div></div>';
+    root.innerHTML = '<div class="tc-ring"></div><div class="tc-ring r2"></div><div class="tc-inner"><div class="tc-title"></div><div class="tc-sub"></div></div>';
     root.querySelector('.tc-title').textContent = title;
     root.querySelector('.tc-sub').textContent = sub || '';
     clearTimeout(root._t);
@@ -93,7 +93,88 @@
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }
 
+  // ---------------------------------------------------------------- ambient background (per-era mood particles)
+  const AMBIENT = {
+    stone: { n: 34, color: '#ff9a4a', kind: 'ember' }, bronze: { n: 34, color: '#ffcf6a', kind: 'ember' },
+    classical: { n: 30, color: '#fff3dc', kind: 'dust' }, medieval: { n: 30, color: '#ffc86a', kind: 'ember' },
+    industrial: { n: 18, color: '#b8b0a4', kind: 'smoke' }, atomic: { n: 46, color: '#4dff88', kind: 'rain' },
+    spacefaring: { n: 70, color: '#cfe6ff', kind: 'star' }, interstellar: { n: 90, color: '#d6ccff', kind: 'star' },
+    war: { n: 40, color: '#ff5a44', kind: 'ember' },
+  };
+  let bg, bgx, motes = [], moteTheme = '', bgLast = 0;
+
+  function spawnMote(kind, W, H, fresh) {
+    const m = { x: Math.random() * W, y: fresh ? Math.random() * H : (kind === 'rain' ? -10 : H + 10), a: Math.random(),
+      s: 0.6 + Math.random() * 1.8, vx: (Math.random() - 0.5) * 8, vy: 0, ph: Math.random() * 6.28 };
+    if (kind === 'ember') m.vy = -(10 + Math.random() * 22);
+    if (kind === 'dust') { m.vy = -(2 + Math.random() * 5); m.vx = (Math.random() - 0.5) * 6; }
+    if (kind === 'smoke') { m.vy = -(4 + Math.random() * 6); m.s = 40 + Math.random() * 60; }
+    if (kind === 'rain') { m.vy = 30 + Math.random() * 50; m.vx = 0; }
+    if (kind === 'star') { m.vy = 0; m.vx = 0; }
+    return m;
+  }
+
+  function ambient(t) {
+    requestAnimationFrame(ambient);
+    if (!bg || document.hidden) return;
+    if (t - bgLast < 42) return; // ~24 fps is plenty for mood particles
+    const dt = Math.min(0.1, (t - bgLast) / 1000);
+    bgLast = t;
+    const W = window.innerWidth, H = window.innerHeight, dpr = devicePixelRatio;
+    const theme = document.body.dataset.era || 'stone';
+    const cfg = AMBIENT[theme] || AMBIENT.stone;
+    if (theme !== moteTheme) { moteTheme = theme; motes = []; for (let i = 0; i < cfg.n; i++) motes.push(spawnMote(cfg.kind, W, H, true)); }
+    bgx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bgx.clearRect(0, 0, W, H);
+    if (!IG.state.settings.particles) return;
+    bgx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < motes.length; i++) {
+      const m = motes[i];
+      m.ph += dt;
+      m.x += (m.vx + Math.sin(m.ph) * 4) * dt;
+      m.y += m.vy * dt;
+      if (m.y < -120 || m.y > H + 20 || m.x < -120 || m.x > W + 120) { motes[i] = spawnMote(cfg.kind, W, H, false); continue; }
+      let alpha;
+      if (cfg.kind === 'star') alpha = 0.15 + 0.35 * (0.5 + 0.5 * Math.sin(m.ph * 1.7 + m.a * 10));
+      else if (cfg.kind === 'smoke') alpha = 0.035;
+      else alpha = 0.18 + 0.3 * m.a * (0.6 + 0.4 * Math.sin(m.ph * 3));
+      bgx.globalAlpha = alpha;
+      bgx.fillStyle = cfg.color;
+      bgx.beginPath();
+      bgx.arc(m.x, m.y, m.s, 0, 6.283);
+      bgx.fill();
+    }
+    bgx.globalAlpha = 1;
+    bgx.globalCompositeOperation = 'source-over';
+  }
+
+  function resizeBg() {
+    if (!bg) return;
+    bg.width = window.innerWidth * devicePixelRatio;
+    bg.height = window.innerHeight * devicePixelRatio;
+    bg.style.width = window.innerWidth + 'px';
+    bg.style.height = window.innerHeight + 'px';
+    moteTheme = '';
+  }
+
+  function flashCard(sel) {
+    const n = document.querySelector(sel);
+    if (!n) return;
+    n.classList.remove('flash');
+    void n.offsetWidth;
+    n.classList.add('flash');
+  }
+
   function init() {
+    bg = document.getElementById('bg-canvas');
+    if (bg) { bgx = bg.getContext('2d'); resizeBg(); window.addEventListener('resize', resizeBg); requestAnimationFrame(ambient); }
+    IG.Bus.on('purchase', (d) => {
+      if (d.kind === 'gen' || d.kind === 'upgrade') flashCard('.gen-card[data-gen="' + d.id + '"]');
+    });
+    IG.Bus.on('popup', (d) => {
+      if (d.cls === 'gold' && d.x !== undefined) burst(d.x, d.y, 16, '#ffd76a');
+      else if (d.cls === 'food' && d.x !== undefined) burst(d.x, d.y, 6, '#f0c27a');
+    });
     canvas = document.getElementById('fx-canvas');
     ctx = canvas.getContext('2d');
     resize();

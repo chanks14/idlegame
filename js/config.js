@@ -474,6 +474,7 @@
       worldBonus: 0.02,       // each matured world: +2% to every older era's generators
       firstContact: 20000,
       galaxy: { stars: 7000, arms: 4, seed: 7331, fullAtWorlds: 1e9 },
+      capacity: 1e12,         // the galaxy is finite: claims taper as the empire approaches this many worlds
     },
 
     // ---------------------------------------------------------------- Galactic War

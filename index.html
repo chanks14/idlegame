@@ -7,13 +7,14 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-era="stone">
+  <canvas id="bg-canvas"></canvas>
   <div id="app">
     <header id="header">
       <div class="brand"><span class="brand-title">The Undying Hand</span><span class="brand-sub">From Stone Age to Galactic Empire</span></div>
       <div id="era-badge" class="era-badge"></div>
       <div id="res-bar" class="res-bar"></div>
       <div id="pp-chip" class="pp-chip hidden"></div>
-      <div class="hdr-btns"><button id="btn-save" class="btn small" title="Save (S)">Save</button></div>
+      <div class="hdr-btns"><button id="btn-mute" class="btn small icon-btn" title="Mute (M)"></button><button id="btn-save" class="btn small" title="Save (S)">Save</button></div>
     </header>
     <nav id="tabbar" class="tabbar"></nav>
     <div id="main">
@@ -81,6 +82,7 @@
   <script src="js/ui/settings.js"></script>
   <script src="js/ui/modals.js"></script>
   <script src="js/ui/juice.js"></script>
+  <script src="js/ui/audio.js"></script>
   <script src="js/ui/dev.js"></script>
   <script src="js/main.js"></script>
 </body>

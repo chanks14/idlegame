@@ -74,6 +74,9 @@
   // Split `count` worlds across planet types by weight, deterministically (fractional carry per type).
   function claim(count, time) {
     if (!active() || count <= 0) return 0;
+    const room = Math.max(0, 1 - cachedTotals.total / X().capacity);
+    count = count * room;
+    if (count <= 0) return 0;
     const e = st(), P = X().planets;
     let W = 0;
     for (const t in P) W += P[t].weight;

@@ -369,3 +369,28 @@ b.gold, .gold { color: var(--gold); }
 .faction-item { display: flex; gap: 8px; align-items: center; padding: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; color: var(--fc); }
 .faction-item b { color: var(--fc); }
 @media (max-width: 1300px) { .war-layout { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------- phase 6 polish */
+#bg-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+#app { position: relative; z-index: 1; }
+#header, .tabbar { background-color: transparent; }
+#header { background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.05)), linear-gradient(var(--panel2), var(--panel)); }
+.icon-btn { padding: 3px 7px; display: inline-flex; align-items: center; }
+.icon-btn .ic { width: 16px; height: 16px; }
+.muted-btn { opacity: .45; text-decoration: line-through; }
+.gen-card.flash { animation: cardFlash .45s ease-out; }
+@keyframes cardFlash { 0% { box-shadow: 0 0 0 0 var(--accent); border-color: var(--accent); } 100% { box-shadow: 0 0 18px 0 transparent; } }
+.gen-top .ic-lg, .gen-card .icw { filter: drop-shadow(0 0 6px var(--glow)); }
+.res-chip .ic, .res-row .ic { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--rc) 60%, transparent)); }
+.era-badge .ic, .era-title .ic { filter: drop-shadow(0 0 6px var(--accent)); }
+.tc-ring { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+  border: 2px solid var(--accent); box-shadow: 0 0 30px var(--accent), inset 0 0 30px var(--accent); opacity: 0; }
+.transition.show .tc-ring { animation: shock 1.8s ease-out forwards; }
+.transition.show .tc-ring.r2 { animation-delay: .35s; }
+@keyframes shock { 0% { transform: scale(.2); opacity: .9; } 100% { transform: scale(40); opacity: 0; } }
+.transition.prestige .tc-ring { border-color: #c8a8ff; box-shadow: 0 0 30px #8a5cff, inset 0 0 30px #8a5cff; }
+.forage-btn .ic { filter: drop-shadow(0 0 8px var(--accent)); }
+.forage-btn:active .ic { transform: rotate(-12deg) scale(1.1); }
+.ach.got .ic { filter: drop-shadow(0 0 8px rgba(255,211,106,.8)); }
+.tab .ic { transition: filter .2s; }
+.tab.active .ic { filter: drop-shadow(0 0 5px var(--accent)); }

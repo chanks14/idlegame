@@ -35,7 +35,7 @@
     habTech: (c) => !!IG.Research && IG.Research.level('terraform') >= c.level,
     fronts: (c, s) => s.perm.stats.frontsWon >= c.count,
     frontsLost: (c, s) => s.perm.stats.frontsLost >= c.count,
-    fleet: (c) => !!IG.War && IG.War.fleetStrength().gte(c.amount),
+    fleet: (c) => !!IG.War && IG.War.active() && IG.War.fleetStrength().gte(c.amount),
     bigNumber: (c, s) => Object.values(s.run.resources).some((v) => v.exponent >= 308) ||
       (!!IG.Prod.cache.gross && Object.values(IG.Prod.cache.gross).some((v) => v.exponent >= 308)),
   };

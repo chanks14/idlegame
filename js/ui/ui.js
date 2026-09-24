@@ -288,6 +288,11 @@
       (IG.Prestige.canPrestige() ? '<br>Prestige now for <b>+' + IG.fmtInt(IG.Prestige.gain()) + '</b>' : '') + '<br><span class="muted">Click to open the Power Tree.</span>';
     refs.ppChip.addEventListener('click', () => switchTab('powertree'));
     document.getElementById('btn-save').addEventListener('click', () => { if (IG.Save.save()) toast('Game saved.'); });
+    const mute = document.getElementById('btn-mute');
+    const drawMute = () => { mute.innerHTML = IG.icons.html('sound'); mute.classList.toggle('muted-btn', !!IG.state.settings.mute); };
+    mute.addEventListener('click', () => { IG.state.settings.mute = !IG.state.settings.mute; IG.Bus.emit('settings', 'mute'); drawMute(); });
+    IG.Bus.on('settings', drawMute);
+    drawMute();
     IG.Bus.on('log', onLog);
     IG.Bus.on('structure', () => { dirty = true; });
     IG.Bus.on('era', () => { dirty = true; eraKey = ''; tabbarKey = ''; });

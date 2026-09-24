@@ -10,7 +10,7 @@
        20,000-world transition.
 - [x] 5. Galactic War Age: war production chain, factions, fronts, attrition, endless escalation,
        military tech.
-- [ ] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
+- [x] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
 - [ ] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
 
 ## Log
@@ -83,6 +83,19 @@
   occupation, scorched retreat, faction counters incl. Disruptors).
 - War tab: prominent empire totals, fleet panel, fronts, galaxy view with faction territories and
   glowing/dashed front arcs. Header shows worlds + fleet. 6 war achievements.
+
+### Phase 6 — Visual polish and sound
+- Full SVG icon set in `js/ui/icons.js`: 15 resources, 32 generators, 10 agents, 8 planets (own palettes),
+  colony ark, 4 faction emblems, 9 era glyphs, UI glyphs, achievement badges by condition type (aliases).
+  Every icon can be replaced via `assets/manifest.js` (`IG.ASSET_OVERRIDES`), see `assets/README.md`.
+- Juice: number pop-ups on purchases, small particle bursts on gold pop-ups/forage, big bursts on era,
+  milestone, achievement, prestige, front victory; generator card flash on purchase; era/prestige title
+  card with double shockwave ring; per-era ambient background particles (embers, dust, smoke, green rain,
+  twinkling stars, war sparks) at ~24 fps, paused when hidden, toggled by the Particles setting.
+- `js/ui/audio.js`: Web Audio synthesized SFX (forage, buy, upgrade, research, ship launch, achievement,
+  era swell, prestige boom + shimmer, front won/lost, welcome back). Mute button in header, M hotkey,
+  volume slider + mute in Settings. Audio unlocks on first user gesture.
+- Galaxy capacity (1e12 worlds) tapers claims only near the cap, keeping world counts finite.
 
 ## Known issues
 - none yet
