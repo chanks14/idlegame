@@ -114,6 +114,7 @@
       setText(refs.resChips[r].amt, IG.fmt(s.run.resources[r]));
       const rt = IG.Prod.cache.rates[r];
       setText(refs.resChips[r].rate, rt ? (rt.lt(0) ? '' : '+') + IG.fmtRate(rt) : '');
+      toggle(refs.resChips[r].rate, 'neg', !!rt && rt.lt(0));
     }
     const e = IG.CONFIG.eras[s.run.era];
     setHTML(refs.eraBadge, IG.icons.html('era_' + e.id) + '<span>' + e.name + '</span>');
@@ -159,7 +160,8 @@
         refs.msRows = IG.Eras.progress().map((p) => {
           const bar = el('div', { class: 'bar-fill' });
           const lbl = el('span', { class: 'ms-label' });
-          const row = el('div', { class: 'ms-row' }, [lbl, el('div', { class: 'bar' }, [bar])]);
+          const rc = p.res && IG.CONFIG.resources[p.res] ? IG.CONFIG.resources[p.res].color : null;
+          const row = el('div', { class: 'ms-row', style: rc ? { '--rc': rc } : {} }, [lbl, el('div', { class: 'bar' }, [bar])]);
           refs.msList.appendChild(row);
           return { row, bar, lbl };
         });
@@ -210,7 +212,8 @@
     for (const r in refs.resRows) {
       setText(refs.resRows[r].amt, IG.fmt(s.run.resources[r]));
       const rt = IG.Prod.cache.rates[r];
-      setText(refs.resRows[r].rate, rt && !rt.eq(0) ? IG.fmtRate(rt) : '');
+      setText(refs.resRows[r].rate, rt && !rt.eq(0) ? (rt.lt(0) ? '' : '+') + IG.fmtRate(rt) : '');
+      toggle(refs.resRows[r].rate, 'neg', !!rt && rt.lt(0));
     }
   }
 

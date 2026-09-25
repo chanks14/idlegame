@@ -45,7 +45,7 @@
         case 'worlds': frac = IG.Expansion ? Math.min(1, IG.Expansion.totalWorlds() / c.count) : 0; break;
         case 'fronts': frac = s.run.war ? Math.min(1, s.run.war.won / c.count) : 0; break;
       }
-      return { label: condLabel(c), frac, done: frac >= 1 };
+      return { label: condLabel(c), frac, done: frac >= 1, res: c.res };
     });
   }
 

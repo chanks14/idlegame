@@ -74,7 +74,8 @@
     const upBtn = el('button', { class: 'btn up', tip: () => upTip(id), on: { click: (e) => {
       if (IG.Prod.buyUpgrade(id)) IG.Bus.emit('popup', { x: e.clientX, y: e.clientY, text: '×' + IG.CONFIG.genUpgrades.mult, cls: 'gold' });
     } } }, '⬆');
-    const node = el('div', { class: 'gen-card', 'data-gen': id }, [
+    const main = Object.keys(g.produces)[0];
+    const node = el('div', { class: 'gen-card', 'data-gen': id, style: { '--rc': IG.CONFIG.resources[main].color } }, [
       el('div', { class: 'gen-top', tip: () => genTip(id) }, [IG.icons.node(g.icon || id, 'ic-lg'),
         el('div', { class: 'gen-info' }, [el('div', { class: 'gen-name' }, [el('span', { text: g.name }), count]), rate])]),
       el('div', { class: 'gen-actions' }, [btn, upBtn]),
@@ -89,8 +90,11 @@
     const rates = IG.Prod.cache.genRates[id];
     const g = IG.CONFIG.generators[id];
     let rt = '';
-    for (const r in g.produces) rt += (rates && rates[r] ? IG.fmtRate(rates[r]) : '0/s') + ' ' + IG.CONFIG.resources[r].name + '  ';
-    setText(c.rate, rt);
+    for (const r in g.produces) {
+      rt += '<span class="gen-out" style="--rc:' + IG.CONFIG.resources[r].color + '">' + IG.icons.html(r, 'ic-sm') +
+        (rates && rates[r] ? IG.fmtRate(rates[r]) : '0/s') + '</span>';
+    }
+    setHTML(c.rate, rt);
     const n = IG.Prod.displayAmount(id, mode);
     const costs = IG.Prod.costFor(id, n);
     setHTML(c.cost, IG.dom.costHTML(costs));
@@ -192,8 +196,8 @@
     if (forageRefs) {
       const g = IG.Prod.forageGains();
       let t = '';
-      for (const r in g) t += '+' + IG.fmt(g[r]) + ' ' + IG.CONFIG.resources[r].name + '  ';
-      setText(forageRefs.info, t + '· clicks: ' + IG.fmtInt(IG.state.run.clicks));
+      for (const r in g) t += '<span class="gen-out" style="--rc:' + IG.CONFIG.resources[r].color + '">' + IG.icons.html(r, 'ic-sm') + '+' + IG.fmt(g[r]) + '</span>';
+      setHTML(forageRefs.info, t + '<span class="muted">per click · ' + IG.fmtInt(IG.state.run.clicks) + ' clicks</span>');
     }
   }
 

@@ -14,6 +14,8 @@
   }
 
   function header(box, iconName, title, desc) {
+    const res = C().resources[iconName];
+    box.style.setProperty('--rc', res ? res.color : '#e0b64a');
     box.appendChild(el('div', { class: 'mech-title' }, [IG.icons.node(iconName), el('span', { text: title })]));
     if (desc) box.appendChild(el('div', { class: 'mech-desc', text: desc }));
   }
@@ -32,7 +34,7 @@
         const btn = el('button', { class: 'btn small', on: { click: (e) => {
           if (IG.Trade.buy(id)) IG.Bus.emit('popup', { x: e.clientX, y: e.clientY, text: r.name + ' +1', cls: 'gold' });
         } } }, 'Extend');
-        const item = el('div', { class: 'mech-item', tip: () => '<b>' + r.name + '</b><br><i>' + r.desc + '</i><br>' +
+        const item = el('div', { class: 'mech-item', style: { '--rc': C().resources[r.res].color }, tip: () => '<b>' + r.name + '</b><br><i>' + r.desc + '</i><br>' +
           C().resources[r.res].name + ' production: ' + IG.fmtMult(IG.Trade.mult(id)) + ' → <b>' + IG.fmtMult(IG.Trade.mult(id, IG.Trade.level(id) + 1)) + '</b><br>Cost: ' + IG.dom.costHTML(IG.Trade.cost(id)) },
         [el('div', { class: 'row' }, [el('span', {}, [IG.icons.node(r.res, 'ic-sm'), ' ' + r.name]), lv]), eff, el('div', { class: 'row' }, [cost, btn])]);
         grid.appendChild(item);

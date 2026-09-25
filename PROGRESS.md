@@ -12,6 +12,7 @@
        military tech.
 - [x] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
 - [x] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
+- [x] 8. Color overhaul: full-color icon set, resource-coded UI.
 
 ## Log
 ### Phase 1 — core engine + Stone Age
@@ -116,6 +117,21 @@
   - Saves store Decimals exactly as [mantissa, exponent] (SAVE_VERSION 2 + migration).
   - Suffix notation falls back to scientific beyond 1e303.
 - Performance (browser, 5M worlds, 1e450 values): tick 0.13–0.57 ms, UI refresh < 1 ms; 24 h offline ≈ 0.4 s.
+
+### Phase 8 — Color overhaul
+- `js/ui/icons.js` redrawn as full-color flat illustrations (tiny `p/c/r/s` SVG builders, shade/highlight overlays):
+  green apple for Food, grey rock, copper ingot, open book, gold coin, votive candle, yellow bolt, chip, steel
+  I-beam, violet star, shell, warship, crested helmet, ringed planet; every generator, agent, era glyph, colony ark
+  and tab glyph got its own palette. Only `lock`, `unknown`, `sound` and faction emblems still use currentColor.
+- Resource colors in `CONFIG.resources[*].color` retuned so each resource has a distinct hue (Food is now green).
+- Resource-coded UI via `--rc`: header chips, Stores rows (color bar + name), milestone bars, generator cards
+  (top stripe, tinted icon tile, count pill, colored output with icons, Buy button tinted when affordable),
+  agent recruit cards (by recruit cost), mechanic panels and trade routes. Positive rates green, negative red.
+- Semantic colors that don't change per era: `--knowledge` (affordable research glows blue), gold upgrades,
+  green completed milestones/research. Tabs show colored icons (dimmed when inactive), Chronicle entries get
+  colored side markers, resource/generator achievements show that resource's or generator's icon.
+- Fixed: `IG.dom.el` set CSS custom properties with `style[k] = v`, which browsers ignore — `--rc`/`--fc` from
+  inline styles never applied (faction colors on fronts were missing). Now uses `style.setProperty`.
 
 ## Known issues
 - Pacing numbers come from an idealized simulated player; expect a human to be ~1.2–1.6× slower.

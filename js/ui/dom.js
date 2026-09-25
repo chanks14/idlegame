@@ -13,7 +13,9 @@
         else if (k === 'text') node.textContent = v;
         else if (k === 'html') node.innerHTML = v;
         else if (k === 'on') { for (const ev in v) node.addEventListener(ev, v[ev]); }
-        else if (k === 'style') { for (const sk in v) node.style[sk] = v[sk]; }
+        else if (k === 'style') {
+          for (const sk in v) { if (sk.startsWith('--')) node.style.setProperty(sk, v[sk]); else node.style[sk] = v[sk]; }
+        }
         else if (k === 'tip') node._tip = v;
         else if (k === 'dataset') { for (const dk in v) node.dataset[dk] = v[dk]; }
         else node.setAttribute(k, v);

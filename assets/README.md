@@ -21,4 +21,5 @@ Icon names are the keys of `P` in `js/ui/icons.js`:
 - eras: `era_<id>` (e.g. `era_bronze`); ships: `colony_ship`, `warships`
 - UI glyphs: `production`, `research`, `agents`, `galaxy`, `front`, `settings`, `stats`, `star`, `lock`, …
 
-Overrides render as `<img>` at the same size as the SVG they replace, so square images work best.
+Overrides render as `<img>` at the same size as the SVG they replace, so square images work best. The built-in icons
+are full color; UI accents come from the resource colors in `js/config.js`, so an override doesn't need to match them.

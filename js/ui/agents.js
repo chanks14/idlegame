@@ -57,7 +57,7 @@
         if (a) IG.Bus.emit('popup', { x: e.clientX, y: e.clientY, text: a.name, cls: 'gold' });
       } } }, 'Recruit ' + T.name);
       const areas = T.areas.map((ar) => C().agents.areas[ar].name).join(', ');
-      rg.appendChild(el('div', { class: 'gen-card', tip: '<b>' + T.name + '</b><br><i>' + T.desc + '</i><br>Can staff: ' + areas }, [
+      rg.appendChild(el('div', { class: 'gen-card', style: { '--rc': C().resources[Object.keys(T.recruit)[0]].color }, tip: '<b>' + T.name + '</b><br><i>' + T.desc + '</i><br>Can staff: ' + areas }, [
         el('div', { class: 'gen-top' }, [IG.icons.node('agent_' + t, 'ic-lg'), el('div', { class: 'gen-info' }, [
           el('div', { class: 'gen-name' }, [el('span', { text: T.name }), count]), el('div', { class: 'gen-rate', text: areas })])]),
         el('div', { class: 'gen-actions' }, [btn]), cost]));
