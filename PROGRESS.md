@@ -38,7 +38,7 @@
   Power Grid (Industrial, sector multipliers with energy upkeep + brown-out), Compute Programs (Atomic,
   slider allocation of compute capacity), Megaprojects (Spacefaring, production share diverted to builds).
 - Synergies: later resources (produced this run) multiply every earlier era's generators (log-based).
-- Agents: 8 types (Shaman → Navigator), recruit/assign/upgrade, 14 areas, procedurally generated names.
+- Agents: 8 types (Shaman → Navigator), recruit/assign/upgrade (crews + promotion since the rework), 14 areas, procedurally generated names.
 - 46 achievements (×1.02 production each), Stats tab, Achievements tab, unlock teasers ("???") for
   tabs, mechanics, agent types, locked generators and the next era. Per-era CSS themes.
 - `tools/sim.js` first version (greedy active-player strategy; reports era times per run).
@@ -119,6 +119,19 @@
   - Suffix notation falls back to scientific beyond 1e303.
 - Performance (browser, 5M worlds, 1e450 values): tick 0.13–0.57 ms, UI refresh < 1 ms; 24 h offline ≈ 0.4 s.
 
+### Agents rework — crews and promotion
+- Problem: one agent per area but unlimited recruiting, so extra agents sat idle (a 2nd Scholar always did).
+- Areas now hold a crew: `agents.crewBase` = 2, `solo` areas (rites, grid, compute, mega, ships, fleet) hold 1.
+  New `crewSize` modifier: +1 from Bureaucratic Machines (Atomic research) and Gathered Congregations (Retinue node,
+  2 levels). Every crew member acts on its own timer; recruiting needs a free post (button explains why not).
+- Upgrades now only add speed (removed `bulkEvery` level bulk); extra actions come from more crew members and
+  the Remembered Names node.
+- Promotion: an agent can rise to any unlocked type of a later era for 50% of that type's recruit cost, keeping
+  half its levels (rounded up) and its post when the new type can staff it. "Promote…" dialog in the roster.
+- Agents tab: free posts per type, crew counts (n/cap) in the area picker and overview, full areas disabled;
+  the overview hides areas no unlocked type can staff. No save-format change (agents keep the same fields).
+- Sim strategy fills free posts and promotes agents stuck in works two or more eras old.
+
 ### Phase 8 — Color overhaul
 - `js/ui/icons.js` redrawn as full-color flat illustrations (tiny `p/c/r/s` SVG builders, shade/highlight overlays):
   green apple for Food, grey rock, copper ingot, open book, gold coin, votive candle, yellow bolt, chip, steel
@@ -166,6 +179,14 @@
 - Casual profile (`--cps 2 --manage 10`): Classical 27 m, Interstellar run 6 (3 h 10 m), War run 7 (4 h 28 m).
 - Check-in profile (`--cps 1 --manage 120`, agents do most work): Classical 40 m, Interstellar run 7
   (5 h 22 m), War run 8 (6 h 46 m).
+- After the agents rework (crews + promotion), same profiles: active Classical 25 m, Interstellar run 6
+  (2 h 53 m), War run 7 (4 h 08 m); casual Classical 24 m, Interstellar run 6 (3 h 09 m), War run 7
+  (4 h 13 m); check-in Classical 39 m, Interstellar run 7 (5 h 16 m), War run 8 (6 h 39 m). Pre-change
+  baseline on the same build: active 3 h 07 m / 4 h 10 m, check-in 5 h 06 m / 6 h 30 m — within ~5%.
+- Combined build (agents rework + modernization, merged into `main`), active profile: Classical 24 m, Industrial
+  run 3, Atomic + Spacefaring run 5, Interstellar run 6 at 2 h 43 m, War run 7 at 3 h 56 m — ~13 % faster to
+  Interstellar than the Phase 7 baseline (3 h 07 m), ~6 % to War. Each change alone was ~5 %. If that is too fast,
+  lower `modernize.multPerTier` (1.25) first.
 - War arc (from a first-contact snapshot): fast conquest for ~20 min, contested fronts for ~2–2.5 h
   (~75–140 fronts won, worlds 60k → ~4M), then escalation wins and the player prestiges.
 - Levers: era milestone amounts (per-era length), bootstrap generator cost growth, power tree effect/cost

@@ -97,7 +97,7 @@
     const unlock = () => { ensure(); if (ctx && ctx.state === 'suspended') ctx.resume(); };
     window.addEventListener('pointerdown', unlock, { once: true });
     window.addEventListener('keydown', unlock, { once: true });
-    const KIND = { gen: 'buy', upgrade: 'upgrade', research: 'research', node: 'upgrade', agent: 'upgrade', agentUp: 'upgrade',
+    const KIND = { gen: 'buy', upgrade: 'upgrade', research: 'research', node: 'upgrade', agent: 'upgrade', agentUp: 'upgrade', agentPromote: 'upgrade',
       trade: 'buy', grid: 'buy', rite: 'research', ship: 'ship' };
     IG.Bus.on('purchase', (d) => play(KIND[d.kind] || 'buy'));
     IG.Bus.on('forage', () => play('forage'));

@@ -390,7 +390,7 @@
       containers: { era: 5, tier: 1, name: 'Container Shipping', cost: { knowledge: 3e12, compute: 800 }, prereq: ['time_sharing'],
         desc: 'One box, every port.', effects: [{ type: 'prod', res: 'coin', mult: 5 }, { type: 'tradeMult', mult: 1.5 }] },
       bureaucracy: { era: 5, tier: 1, name: 'Bureaucratic Machines', cost: { knowledge: 5e12, compute: 1500 }, prereq: ['transistor'],
-        desc: 'Forms in triplicate, processed at lightspeed.', effects: [{ type: 'unlock', key: 'agent:administrator' }, { type: 'prod', era: 5, mult: 1.5 }] },
+        desc: 'Forms in triplicate, processed at lightspeed.', effects: [{ type: 'unlock', key: 'agent:administrator' }, { type: 'prod', era: 5, mult: 1.5 }, { type: 'crewSize', add: 1 }] },
       satellites: { era: 5, tier: 2, name: 'Satellite Relays', cost: { knowledge: 1.5e13, compute: 6000 }, prereq: ['containers'],
         desc: 'Voices bounced off artificial moons.', effects: [{ type: 'computeMult', mult: 1.5 }, { type: 'agentSpeed', mult: 1.25 }] },
       breeder: { era: 5, tier: 2, name: 'Breeder Reactors', cost: { knowledge: 2e13, compute: 1e4 }, prereq: ['bureaucracy'],
@@ -639,8 +639,9 @@
     // ---------------------------------------------------------------- agents
     agents: {
       baseInterval: { forage: 1, gen: 3, research: 5, trade: 4, rites: 3, grid: 5, compute: 10, mega: 5, ships: 2, warfleet: 3 },
-      speedPerLevel: 0.2,        // interval / (1 + speedPerLevel × (level − 1))
-      bulkEvery: 3,              // +1 bulk action per this many levels
+      speedPerLevel: 0.2,        // interval / (1 + speedPerLevel × (level − 1)); levels only add speed
+      crewBase: 2,               // agents per area (solo areas hold one); + crewSize modifier
+      promote: { costMult: 0.5, keepLevels: 0.5 },  // promotion = this × the new type's recruit cost; keeps ⌈level × keepLevels⌉
       forageClicksPerLevel: 2,   // forage clicks per action = level × this
       maxActionsPerTick: 12,
       types: {
@@ -675,14 +676,14 @@
         gen5: { name: 'Atomic works', kind: 'gen', era: 5, desc: 'Buys Atomic generators and upgrades.' },
         gen6: { name: 'Spacefaring works', kind: 'gen', era: 6, desc: 'Buys Spacefaring generators and upgrades.' },
         gen8: { name: 'War industry', kind: 'gen', era: 8, desc: 'Buys foundries, shipyards and barracks.' },
-        warfleet: { name: 'Fleet command', kind: 'warfleet', minEra: 8, desc: 'Allocates the fleet across fronts in proportion to enemy strength.' },
+        warfleet: { name: 'Fleet command', kind: 'warfleet', solo: true, minEra: 8, desc: 'Allocates the fleet across fronts in proportion to enemy strength.' },
         research: { name: 'Research', kind: 'research', desc: 'Researches the cheapest available tech.' },
         trade: { name: 'Trade routes', kind: 'trade', mech: 'mech:trade', desc: 'Extends the cheapest trade route.' },
-        rites: { name: 'Rites', kind: 'rites', mech: 'mech:rites', desc: 'Keeps rites burning when faith allows.' },
-        grid: { name: 'Power grid', kind: 'grid', mech: 'mech:grid', desc: 'Raises grid sectors while energy allows; cuts power on shortfall.' },
-        compute: { name: 'Compute programs', kind: 'compute', mech: 'mech:compute', desc: 'Balances compute across all programs.' },
-        mega: { name: 'Megaprojects', kind: 'mega', mech: 'mech:mega', desc: 'Starts the next megaproject when one completes.' },
-        ships: { name: 'Colony ships', kind: 'ships', minEra: 7, desc: 'Builds as many colony ships as stores allow.' },
+        rites: { name: 'Rites', kind: 'rites', solo: true, mech: 'mech:rites', desc: 'Keeps rites burning when faith allows.' },
+        grid: { name: 'Power grid', kind: 'grid', solo: true, mech: 'mech:grid', desc: 'Raises grid sectors while energy allows; cuts power on shortfall.' },
+        compute: { name: 'Compute programs', kind: 'compute', solo: true, mech: 'mech:compute', desc: 'Balances compute across all programs.' },
+        mega: { name: 'Megaprojects', kind: 'mega', solo: true, mech: 'mech:mega', desc: 'Starts the next megaproject when one completes.' },
+        ships: { name: 'Colony ships', kind: 'ships', solo: true, minEra: 7, desc: 'Builds as many colony ships as stores allow.' },
       },
       names: {  // syllable tables for procedurally generated agent names, by agent era
         first: [['Ukka', 'Tor', 'Mara', 'Ghel', 'Oru', 'Senn', 'Adda', 'Rhu'],
@@ -762,6 +763,8 @@
           desc: 'Mortals serve you for less.', effects: [{ type: 'agentCost', mult: 0.6 }] },
         ret3: { branch: 2, depth: 3, name: 'Remembered Names', maxLevel: 5, cost: [25, 3], req: { ret2: 2 },
           desc: 'Each agent acts more times per turn.', effects: [{ type: 'agentPower', add: 1 }] },
+        ret_crew: { branch: 2, depth: 3, lat: 0.3, name: 'Gathered Congregations', maxLevel: 2, cost: [15, 4], req: { ret_first: 1 },
+          desc: 'More mortals crowd into every post you open.', effects: [{ type: 'crewSize', add: 1 }] },
         // Inheritance — starting resources
         inh1: { branch: 3, depth: 1, name: 'Buried Caches', maxLevel: 5, cost: [1, 2],
           desc: 'Food and stone hidden for the next dawn.', effects: [{ type: 'startRes', res: 'food', amount: 2000 }, { type: 'startRes', res: 'stone', amount: 500 }] },

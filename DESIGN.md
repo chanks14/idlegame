@@ -152,7 +152,13 @@ Stats, Settings. Tabs appear as they unlock. Header shows primary resources, cur
   presses "Advance".
 
 ## Agents
-Recruit (cost scales per type), assign to one *area*, upgrade (faster and bigger actions). Types: Shaman
+Recruit (cost scales per type) into a free post, assign to an *area*, upgrade (faster actions), promote.
+Each area holds a small crew (`agents.crewBase`, +`crewSize` from Bureaucratic Machines and the Power Tree);
+areas whose action is all-or-nothing (rites, grid, compute, megaprojects, colony ships, fleet command) are
+`solo` and hold one. Every agent in a crew acts on its own timer, so **recruiting adds actions and upgrading
+adds speed**. Recruiting is blocked when every eligible post is full, so no agent is ever bought just to idle.
+Promotion turns an agent into an unlocked type of a later era for `promote.costMult` × that type's recruit
+cost, keeping ⌈level × `promote.keepLevels`⌉; it keeps its post if the new type can staff it. Types: Shaman
 (Stone), Priest (Bronze), Scholar & Merchant (Classical), Warden (Medieval), Industrialist (Industrial),
 Administrator (Atomic), Navigator (Spacefaring), Admiral (Galactic War). Each area lists which types may
 staff it. Areas: per-era generators, forage, research, trade, rites, grid, compute, megaprojects, colony

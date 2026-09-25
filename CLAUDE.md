@@ -48,6 +48,11 @@ assets/                 optional file overrides for icons (see assets/README.md)
   `--prestige none`, `--mult 10`, `--set eras.2.milestone.0.amount=1e6`, `--snapshot/--from`, `--warlog`).
 - `node tools/uitest.js` — Playwright browser smoke test through all eras/tabs (needs Chromium).
 
+## Git
+- Solo project: **all work goes on `main`.** Commit and push directly to `main` (`git push origin main`); do not
+  create feature branches or pull requests. If a session starts on another branch, switch to `main` first
+  (`git fetch origin main && git checkout main`), or merge that branch into `main` before pushing.
+
 ## Workflow rules
 - One feature at a time; keep the game playable after each change (open index.html, no console errors).
 - Run `node tools/sim.js` after balance changes and note results in PROGRESS.md. Keep level-based effects
