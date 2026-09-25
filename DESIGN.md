@@ -142,6 +142,10 @@ Stats, Settings. Tabs appear as they unlock. Header shows primary resources, cur
   "synergy", configured per resource). Early generators of each era cost earlier resources, and research
   costs mix knowledge with era resources, so older tiers keep mattering.
 - **Generator upgrades**: each generator has purchasable ×2 upgrades unlocked at owned-count thresholds.
+- **Modernization**: older generators change form as ages pass (Gatherer → Farmstead → … → Hydroponic Tower) so the
+  economy never shows Stone Age works in the Space Age. The form is derived from the current era (same id, count and
+  upgrades; nothing saved); each form reached multiplies output by `modernize.multPerTier`. Lines in
+  `CONFIG.modernize.lines`.
 - **Research**: a small tech tree per era (prerequisites within the era). From the Bronze Age on, research
   costs Knowledge. Interstellar and War have repeatable (leveled) techs.
 - **Milestones**: each era lists conditions (resource amounts, key research). When all are met the player

@@ -103,7 +103,7 @@
     for (const id in C.generators) {
       const g = C.generators[id];
       const up = s.run.gens[id] ? s.run.gens[id].up : 0;
-      const base = m.global.mul(D(upMult).pow(up));
+      const base = m.global.mul(D(upMult).pow(up)).mul(IG.Prod.modernMult(id, s.run.era));
       const per = {};
       for (const r in g.produces) {
         let x = base;

@@ -13,6 +13,7 @@
 - [x] 6. Visual polish and sound: SVG icon set, particles, pop-ups, era transitions, audio.
 - [x] 7. Balancing: headless pacing simulation, config tuning to hit pacing targets, bug fixes.
 - [x] 8. Color overhaul: full-color icon set, resource-coded UI.
+- [x] 9. Modernization: older generators take the current age's form.
 
 ## Log
 ### Phase 1 — core engine + Stone Age
@@ -133,6 +134,18 @@
 - Fixed: `IG.dom.el` set CSS custom properties with `style[k] = v`, which browsers ignore — `--rc`/`--fc` from
   inline styles never applied (faction colors on fronts were missing). Now uses `style.setProperty`.
 
+### Phase 9 — Modernization
+- Older generators no longer stay primitive: each one is a *line* that changes form as ages pass
+  (`CONFIG.modernize.lines`), e.g. Gatherer → Farmstead → Manor Farm → Mechanized Farm → Hydroponic Tower,
+  Flint Knapper → Stone Quarry → Steam Quarry → Strip Mine → Regolith Harvester. 24 lines, 60 forms, 60 new icons.
+- The form is derived from `run.era` (`IG.Prod.view(id)` → name, icon, desc, tier, mult, forms): same generator id,
+  count and upgrades, so research effects, agents, achievements, the sim and saves are unchanged (no SAVE_VERSION bump).
+  A prestige resets the era, so lines return to their original form with it.
+- Each form reached multiplies that generator's output by `modernize.multPerTier` (1.25), applied in
+  `IG.Mods.compile`. Chronicle logs "Modernized: A → B, …" on entering an era; Production-tab era sections get a
+  MODERNIZED tag (tooltip lists every line), generator tooltips show the full lineage and bonus. Upgrade names,
+  research effect text and `gen` milestone labels use the current form's name.
+
 ## Known issues
 - Pacing numbers come from an idealized simulated player; expect a human to be ~1.2–1.6× slower.
 - The endless war is designed to stall eventually (enemy escalation is exponential in time); the intended
@@ -146,8 +159,10 @@
 
 ## Balance notes
 - Final pacing (`node tools/sim.js --hours 8 --dt 3 --manage 3`, idealized active player, 4 clicks/s):
-  Classical (first prestige) run 1 at 26 m · Medieval run 2 · Industrial run 3 · Atomic run 4 ·
-  Spacefaring run 5 · Interstellar run 6 at 3 h 07 m total · Galactic War run 7 at 4 h 10 m.
+  Classical (first prestige) run 1 at 25.5 m · Medieval run 2 · Industrial run 3 · Atomic run 4 ·
+  Spacefaring run 5 · Interstellar run 6 at 2 h 58 m total · Galactic War run 7 at 4 h 00 m.
+  (Before modernization: 26 m / 3 h 07 m / 4 h 10 m. With multPerTier 1.5 the Interstellar Age moved a whole run
+  earlier — run 5 at 2 h 30 m — so 1.25 was chosen: ~4–5 % faster, same run structure.)
 - Casual profile (`--cps 2 --manage 10`): Classical 27 m, Interstellar run 6 (3 h 10 m), War run 7 (4 h 28 m).
 - Check-in profile (`--cps 1 --manage 120`, agents do most work): Classical 40 m, Interstellar run 7
   (5 h 22 m), War run 8 (6 h 46 m).

@@ -22,6 +22,45 @@
     return out;
   }
 
+  // ---- modernization: the current form of a generator line (see CONFIG.modernize)
+  function tiersAt(id, era) {
+    const line = IG.CONFIG.modernize.lines[id];
+    const out = [];
+    if (line) for (const t of line) if (t.era <= era) out.push(t);
+    return out;
+  }
+
+  // {name, icon, desc, tier, mult, forms[]} for generator `id` in `era` (default: the current era)
+  function view(id, era) {
+    const g = cfg(id);
+    const e = era === undefined ? IG.state.run.era : era;
+    const tiers = tiersAt(id, e);
+    const cur = tiers.length ? tiers[tiers.length - 1] : null;
+    return {
+      name: cur ? cur.name : g.name,
+      icon: cur ? cur.icon : (g.icon || id),
+      desc: cur ? cur.desc : g.desc,
+      tier: tiers.length,
+      mult: Math.pow(IG.CONFIG.modernize.multPerTier, tiers.length),
+      forms: [g.name].concat(tiers.map((t) => t.name)),
+    };
+  }
+
+  function modernMult(id, era) {
+    return Math.pow(IG.CONFIG.modernize.multPerTier, tiersAt(id, era === undefined ? IG.state.run.era : era).length);
+  }
+
+  // Era hook: log the lines that change form on entering `era`.
+  function onEraEnter(era) {
+    const changes = [];
+    for (const id in IG.CONFIG.generators) {
+      const line = IG.CONFIG.modernize.lines[id];
+      if (!line || !line.some((t) => t.era === era)) continue;
+      changes.push(view(id, era - 1).name + ' → ' + view(id, era).name);
+    }
+    if (changes.length) IG.Log.add('Modernized: ' + changes.join(', ') + '.', 'milestone');
+  }
+
   // Decimal forms of a generator's cost growth factors, cached on the config object (hot path).
   function growthD(g) {
     if (!g._growthD) { g._growthD = {}; for (const r in g.cost) g._growthD[r] = D(g.cost[r][1]); }
@@ -104,7 +143,7 @@
       ready: s.n >= threshold,
       cost,
       mult: U.mult,
-      name: (U.names[s.up] || ('Tier ' + (s.up + 1))) + ' ' + g.name,
+      name: (U.names[s.up] || ('Tier ' + (s.up + 1))) + ' ' + view(id).name,
     };
   }
 
@@ -229,7 +268,7 @@
 
   const Prod = {
     cache, extraProducers: [],
-    unlocked, listForEra, costFor, maxAfford, canAfford, pay, amountFor, displayAmount, buy,
+    unlocked, listForEra, view, modernMult, onEraEnter, costFor, maxAfford, canAfford, pay, amountFor, displayAmount, buy,
     upgradeInfo, buyUpgrade, computeRates, tick, forage, forageGains,
     totalGenerators() {
       let t = 0;

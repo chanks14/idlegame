@@ -29,7 +29,12 @@
     const C = IG.CONFIG, g = C.generators[id], s = IG.state;
     const n = s.run.gens[id].n;
     const rates = IG.Prod.cache.genRates[id];
-    let h = '<b>' + g.name + '</b><br><i>' + g.desc + '</i><br>';
+    const v = IG.Prod.view(id);
+    let h = '<b>' + v.name + '</b><br><i>' + v.desc + '</i><br>';
+    if (v.tier) {
+      h += '<span class="lineage">' + v.forms.map((f, i) => (i === v.forms.length - 1 ? '<b>' + f + '</b>' : f)).join(' → ') + '</span><br>' +
+        'Modernized ' + v.tier + '×: output ' + IG.fmtMult(v.mult) + '<br>';
+    }
     for (const r in g.produces) {
       const total = rates && rates[r] ? rates[r] : IG.D(0);
       const each = n > 0 ? total.div(n) : IG.D(g.produces[r]).mul(IG.Mods.get().gen[id][r]);
@@ -52,7 +57,7 @@
     if (!info) return 'All upgrades purchased.';
     const g = IG.CONFIG.generators[id];
     const rates = IG.Prod.cache.genRates[id] || {};
-    let h = '<b>' + info.name + '</b><br>' + g.name + ' output ×' + info.mult + '<br>';
+    let h = '<b>' + info.name + '</b><br>' + IG.Prod.view(id).name + ' output ×' + info.mult + '<br>';
     if (!info.ready) h += '<span class="no">Requires ' + info.threshold + ' owned</span><br>';
     for (const r in g.produces) {
       const cur = rates[r] || IG.D(0);
@@ -75,9 +80,10 @@
       if (IG.Prod.buyUpgrade(id)) IG.Bus.emit('popup', { x: e.clientX, y: e.clientY, text: '×' + IG.CONFIG.genUpgrades.mult, cls: 'gold' });
     } } }, '⬆');
     const main = Object.keys(g.produces)[0];
+    const v = IG.Prod.view(id);
     const node = el('div', { class: 'gen-card', 'data-gen': id, style: { '--rc': IG.CONFIG.resources[main].color } }, [
-      el('div', { class: 'gen-top', tip: () => genTip(id) }, [IG.icons.node(g.icon || id, 'ic-lg'),
-        el('div', { class: 'gen-info' }, [el('div', { class: 'gen-name' }, [el('span', { text: g.name }), count]), rate])]),
+      el('div', { class: 'gen-top', tip: () => genTip(id) }, [IG.icons.node(v.icon, 'ic-lg'),
+        el('div', { class: 'gen-info' }, [el('div', { class: 'gen-name' }, [el('span', { text: v.name }), count]), rate])]),
       el('div', { class: 'gen-actions' }, [btn, upBtn]),
       cost,
     ]);
@@ -123,6 +129,18 @@
     return el('div', { class: 'forage-card' }, [btn, info]);
   }
 
+  // "modernized for the X Age" tag on sections whose lines have changed form
+  function modernTag(e) {
+    const s = IG.state;
+    if (e >= s.run.era) return null;
+    const ids = IG.Prod.listForEra(e).filter((id) => IG.Prod.view(id).tier > 0);
+    if (!ids.length) return null;
+    return el('span', { class: 'modern-tag', tip: '<b>Modernized</b><br>' + ids.map((id) => {
+      const v = IG.Prod.view(id);
+      return v.forms.join(' → ') + ' <span class="muted">(' + IG.fmtMult(v.mult) + ')</span>';
+    }).join('<br>') }, 'modernized');
+  }
+
   function build(root) {
     const s = IG.state, C = IG.CONFIG;
     cards = [];
@@ -149,7 +167,8 @@
       const sec = el('section', { class: 'era-section theme-' + era.theme + (collapsed[e] ? ' collapsed' : '') });
       const head = el('div', { class: 'era-head', on: { click: () => {
         collapsed[e] = !collapsed[e]; IG.UI.markDirty(); } } },
-      [IG.icons.node('era_' + era.id), el('span', { text: era.name }), el('span', { class: 'chev', text: collapsed[e] ? '▸' : '▾' })]);
+      [IG.icons.node('era_' + era.id), el('span', { text: era.name }), modernTag(e),
+        el('span', { class: 'chev', text: collapsed[e] ? '▸' : '▾' })]);
       sec.appendChild(head);
       if (!collapsed[e]) {
         if (e === 0) sec.appendChild(buildForage());

@@ -17,6 +17,7 @@ Icon names are the keys of `P` in `js/ui/icons.js`:
 - resources: `food`, `stone`, `bronze`, `knowledge`, `coin`, `faith`, `energy`, `compute`, `alloy`, `starmatter`,
   `materiel`, `warships`, `legions`, `worlds`, `pp`
 - generators: the generator id from `js/config.js` (e.g. `gatherer`, `smelter`, `reactor`, `foundry`)
+- modernized generator forms: the `icon` of each entry in `CONFIG.modernize.lines` (e.g. `m_farmstead`, `m_tokamak`)
 - agents: `agent_<type>` (e.g. `agent_shaman`); planets: `planet_<type>`; factions: `faction_<id>`
 - eras: `era_<id>` (e.g. `era_bronze`); ships: `colony_ship`, `warships`
 - UI glyphs: `production`, `research`, `agents`, `galaxy`, `front`, `settings`, `stats`, `star`, `lock`, …

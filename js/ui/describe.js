@@ -22,7 +22,7 @@
     const C = IG.CONFIG;
     if (e.gen) {
       const ids = Array.isArray(e.gen) ? e.gen : [e.gen];
-      return ids.map((g) => (C.generators[g] ? C.generators[g].name : g)).join(' & ') + ' output';
+      return ids.map((g) => (C.generators[g] ? IG.Prod.view(g).name : g)).join(' & ') + ' output';
     }
     let parts = [];
     if (e.era !== undefined) {
@@ -45,7 +45,7 @@
     const C = IG.CONFIG;
     switch (e.type) {
       case 'prod': return { label: targetName(e), value: IG.fmtMult(IG.D(e.mult).pow(lv)) };
-      case 'cost': return { label: (e.gen ? C.generators[e.gen].name : targetName(e).replace(' production', '')) + ' costs', value: IG.fmtMult(Math.pow(e.mult, lv)) };
+      case 'cost': return { label: (e.gen ? IG.Prod.view(e.gen).name : targetName(e).replace(' production', '')) + ' costs', value: IG.fmtMult(Math.pow(e.mult, lv)) };
       case 'clickRate': return { label: 'Each forage also yields', value: '+' + (Math.round(e.add * lv * 100) / 100) + 's of production' };
       case 'unlock': return { label: 'Unlocks ' + unlockName(e.key), value: lv > 0 ? '✓' : '—' };
       case 'startRes': return { label: 'Start each run with ' + C.resources[e.res].name, value: IG.fmt(e.amount * lv) };

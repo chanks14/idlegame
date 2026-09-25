@@ -11,7 +11,7 @@
     switch (c.type) {
       case 'res': return 'Hold ' + IG.fmt(req(c)) + ' ' + C.resources[c.res].name;
       case 'research': return 'Research ' + C.research[c.id].name;
-      case 'gen': return 'Own ' + c.count + ' ' + C.generators[c.gen].name;
+      case 'gen': return 'Own ' + c.count + ' ' + IG.Prod.view(c.gen).name;
       case 'mega': return 'Complete the ' + C.megaprojects.list[c.id].name;
       case 'worlds': return 'Rule ' + IG.fmtInt(c.count) + ' worlds';
       case 'fronts': return 'Win ' + c.count + ' fronts this run';
@@ -68,6 +68,7 @@
     for (const fn of Eras.onEnter) fn(next, s);
     IG.Mods.dirty = true;
     IG.Log.add('The ' + C.eras[next].name + ' begins. ' + C.eras[next].desc, 'era');
+    IG.Prod.onEraEnter(next);
     if (!silent) IG.Bus.emit('era', { era: next });
   }
 

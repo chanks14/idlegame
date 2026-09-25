@@ -159,6 +159,124 @@
     },
 
     // Purchasable ×mult upgrades unlocked at owned-count thresholds (per generator).
+    // ---------------------------------------------------------------- modernization
+    // Older generators modernize as ages pass: same id, count and upgrades, but the current form (name, icon,
+    // desc) is the last entry of lines[id] whose era ≤ the current era, and output is multiplied by multPerTier
+    // for every form reached. Derived from run.era, so nothing extra is saved.
+    modernize: {
+      multPerTier: 1.25,
+      lines: {
+        gatherer: [
+          { era: 1, name: 'Farmstead', icon: 'm_farmstead', desc: 'Fenced plots and a mud-brick house. Foraging became farming.' },
+          { era: 3, name: 'Manor Farm', icon: 'm_manor_farm', desc: 'Barns, oxen and tenant families working the lord\'s acres.' },
+          { era: 4, name: 'Mechanized Farm', icon: 'm_mech_farm', desc: 'One tractor does the work of a village.' },
+          { era: 6, name: 'Hydroponic Tower', icon: 'm_hydroponic', desc: 'Forty floors of crops under violet light. No soil, no seasons.' },
+        ],
+        knapper: [
+          { era: 1, name: 'Stone Quarry', icon: 'm_quarry', desc: 'Copper picks cut blocks straight from the hillside.' },
+          { era: 4, name: 'Steam Quarry', icon: 'm_steam_quarry', desc: 'Blasting powder and steam cranes.' },
+          { era: 5, name: 'Strip Mine', icon: 'm_strip_mine', desc: 'Excavators the size of houses peel back the land.' },
+          { era: 6, name: 'Regolith Harvester', icon: 'm_regolith', desc: 'Crawlers sift moon dust into building stone.' },
+        ],
+        hunters: [
+          { era: 1, name: 'Herders', icon: 'm_herders', desc: 'The herds are no longer chased. They are kept.' },
+          { era: 4, name: 'Stockyards', icon: 'm_stockyard', desc: 'Rail-fed pens that feed whole cities.' },
+          { era: 6, name: 'Protein Vats', icon: 'm_protein_vat', desc: 'Cultured meat grown in steel tanks.' },
+        ],
+        hearth: [
+          { era: 1, name: 'Mud-brick Village', icon: 'm_village', desc: 'The camp put down roots and walls.' },
+          { era: 3, name: 'Walled Town', icon: 'm_walled_town', desc: 'Markets inside, fields outside, a gate between.' },
+          { era: 4, name: 'Mill Town', icon: 'm_mill_town', desc: 'Terraced houses in the shadow of the chimneys.' },
+          { era: 6, name: 'Arcology', icon: 'm_arcology', desc: 'A whole city under one roof.' },
+        ],
+        smelter: [
+          { era: 3, name: 'Bloomery', icon: 'm_bloomery', desc: 'Water-driven bellows roar day and night.' },
+          { era: 4, name: 'Blast Furnace', icon: 'm_blast_furnace', desc: 'Coke, ore and a river of molten metal.' },
+          { era: 5, name: 'Arc Furnace', icon: 'm_arc_furnace', desc: 'Scrap melted by lightning held in a crucible.' },
+        ],
+        scribe: [
+          { era: 2, name: 'Library', icon: 'm_library', desc: 'Scrolls by the ten thousand, copied and shelved.' },
+          { era: 4, name: 'Printing House', icon: 'm_printing', desc: 'Presses turn out in a day what scribes wrote in a year.' },
+          { era: 5, name: 'Records Archive', icon: 'm_archive', desc: 'Microfilm and magnetic tape in climate-controlled vaults.' },
+          { era: 6, name: 'Data Vault', icon: 'm_data_vault', desc: 'All human writing, etched in crystal.' },
+        ],
+        fields: [
+          { era: 4, name: 'Pumped Irrigation', icon: 'm_windpump', desc: 'Windpumps and steam pumps water the dry plains.' },
+          { era: 6, name: 'Orbital Greenhouse', icon: 'm_orbital_greenhouse', desc: 'Endless sunlight, endless harvest.' },
+        ],
+        forge: [
+          { era: 3, name: 'Smithy', icon: 'm_smithy', desc: 'Every town has one. Every town needs one.' },
+          { era: 4, name: 'Rolling Mill', icon: 'm_rolling_mill', desc: 'Red-hot metal pressed thin between iron rollers.' },
+          { era: 5, name: 'Automated Forge', icon: 'm_auto_forge', desc: 'Robot arms that never tire of the hammer.' },
+        ],
+        market: [
+          { era: 3, name: 'Market Square', icon: 'm_market_square', desc: 'Fair days, guild stalls and a town crier.' },
+          { era: 4, name: 'Department Store', icon: 'm_dept_store', desc: 'Plate glass, gas lamps and fixed prices.' },
+          { era: 6, name: 'Orbital Bazaar', icon: 'm_orbital_bazaar', desc: 'A ring of shops turning above the clouds.' },
+        ],
+        academy: [
+          { era: 3, name: 'Cathedral School', icon: 'm_cathedral_school', desc: 'Latin, logic and the long cold halls.' },
+          { era: 4, name: 'Polytechnic', icon: 'm_polytechnic', desc: 'Engineers, chemists and draughtsmen.' },
+          { era: 5, name: 'Institute of Technology', icon: 'm_institute', desc: 'Where the next century is invented.' },
+        ],
+        mint: [
+          { era: 3, name: 'Royal Mint', icon: 'm_royal_mint', desc: 'The crown\'s own presses, under guard.' },
+          { era: 4, name: 'Central Bank', icon: 'm_central_bank', desc: 'Money becomes paper, and paper becomes promise.' },
+          { era: 5, name: 'Electronic Exchange', icon: 'm_exchange', desc: 'Fortunes made and lost at the speed of a wire.' },
+        ],
+        galley: [
+          { era: 3, name: 'Carrack', icon: 'm_carrack', desc: 'Deep-hulled ships built for the open ocean.' },
+          { era: 4, name: 'Steamship Line', icon: 'm_steamship', desc: 'Iron hulls on a timetable, whatever the wind.' },
+          { era: 5, name: 'Container Port', icon: 'm_container_port', desc: 'Steel boxes stacked to the sky.' },
+          { era: 6, name: 'Cargo Shuttle', icon: 'm_cargo_shuttle', desc: 'Freight between the surface and the orbital docks.' },
+        ],
+        chapel: [
+          { era: 4, name: 'Parish Church', icon: 'm_parish', desc: 'A steeple and a clock for every district.' },
+          { era: 5, name: 'Radio Ministry', icon: 'm_radio_ministry', desc: 'Sermons carried on the airwaves.' },
+          { era: 6, name: 'Star Shrine', icon: 'm_star_shrine', desc: 'A quiet light for travelers between worlds.' },
+        ],
+        monastery: [
+          { era: 4, name: 'Seminary', icon: 'm_seminary', desc: 'Scholars of faith in brick and ivy.' },
+          { era: 6, name: 'Silent Station', icon: 'm_silent_station', desc: 'An orbital retreat where monks keep the long watch.' },
+        ],
+        guildhall: [
+          { era: 4, name: 'Chartered Company', icon: 'm_company', desc: 'Shareholders, ledgers and a flag of its own.' },
+          { era: 5, name: 'Corporate Tower', icon: 'm_corp_tower', desc: 'Forty floors of glass and ambition.' },
+        ],
+        cathedral: [
+          { era: 5, name: 'Megachurch', icon: 'm_megachurch', desc: 'Ten thousand seats and a screen above the altar.' },
+          { era: 6, name: 'Orbital Basilica', icon: 'm_orbital_basilica', desc: 'Rose windows lit by the naked sun.' },
+        ],
+        steam: [
+          { era: 5, name: 'Gas Turbine', icon: 'm_gas_turbine', desc: 'Jet engines bolted to the ground.' },
+          { era: 6, name: 'Antimatter Cell', icon: 'm_antimatter', desc: 'A speck of antimatter in a magnetic cage.' },
+        ],
+        university: [
+          { era: 6, name: 'Lunar University', icon: 'm_lunar_university', desc: 'Lectures under a sky with Earth in it.' },
+        ],
+        works: [
+          { era: 5, name: 'Automated Plant', icon: 'm_auto_plant', desc: 'Robot arms along a conveyor that never stops.' },
+          { era: 6, name: 'Orbital Assembly', icon: 'm_orbital_assembly', desc: 'Drones build in the vacuum, free of gravity.' },
+        ],
+        power_station: [
+          { era: 5, name: 'Hydroelectric Dam', icon: 'm_hydro_dam', desc: 'A river held back to spin the turbines.' },
+          { era: 6, name: 'Solar Satellite', icon: 'm_solar_sat', desc: 'Kilometers of panels beaming power to the ground.' },
+        ],
+        tabulator: [
+          { era: 6, name: 'Server Farm', icon: 'm_server_farm', desc: 'Racks of blinking machines in the cold dark.' },
+        ],
+        reactor: [
+          { era: 6, name: 'Fusion Tokamak', icon: 'm_tokamak', desc: 'A ring of plasma hotter than a star\'s core.' },
+        ],
+        lab: [
+          { era: 6, name: 'Zero-G Laboratory', icon: 'm_zero_g_lab', desc: 'Experiments that only work in free fall.' },
+        ],
+        fab: [
+          { era: 6, name: 'Nanofab', icon: 'm_nanofab', desc: 'Machines that assemble matter atom by atom.' },
+        ],
+      },
+    },
+
     genUpgrades: {
       thresholds: [10, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000],
       mult: 2,
