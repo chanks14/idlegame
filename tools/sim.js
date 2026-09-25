@@ -122,19 +122,25 @@ function manage(res) {
   // research first — it is the cheapest multiplier
   let id, n = 0;
   while ((id = IG.Research.cheapestAffordable()) && n++ < 20) IG.Research.buy(id, true);
-  // agents: recruit one of each unlocked type, then keep them upgraded
+  // agents: fill free posts, promote agents stuck in works two or more eras old, then keep them upgraded
   for (const t in C.agents.types) {
-    if (!IG.Agents.typeUnlocked(t)) continue;
-    const staffed = C.agents.types[t].areas.filter((a) => IG.Agents.areaAvailable(a) && !IG.Agents.occupant(a)).length;
-    if (staffed > 0 && affordableWith(IG.Agents.recruitCost(t), res, 0.3)) IG.Agents.recruit(t, true);
+    if (IG.Agents.canRecruit(t) && affordableWith(IG.Agents.recruitCost(t), res, 0.3)) IG.Agents.recruit(t, true);
   }
   for (const a of s.run.agents) {
-    if (!a.area) { const free = IG.Agents.eligibleAreas(a).find((x) => !IG.Agents.occupant(x)); if (free) IG.Agents.assign(a, free); }
+    const ar = C.agents.areas[a.area];
+    if (ar && ar.kind === 'gen' && ar.era <= s.run.era - 2) {
+      const t = IG.Agents.promoteTargets(a).filter((x) => IG.Agents.canPromote(a, x))
+        .sort((x, y) => C.agents.types[y].era - C.agents.types[x].era)[0];
+      if (t && affordableWith(IG.Agents.promoteCost(a, t), res, 0.3)) IG.Agents.promote(a, t, true);
+    }
+  }
+  IG.Agents.autoStaff();
+  for (const a of s.run.agents) {
     if (affordableWith(IG.Agents.upgradeCost(a), res, 0.1)) IG.Agents.upgrade(a, true);
   }
   if (IG.Trade.unlocked()) { let t; let k = 0; while ((t = IG.Trade.cheapest()) && k++ < 10 && affordableWith(IG.Trade.cost(t), res, 0.5)) IG.Trade.buy(t, true); }
   if (IG.Rites.unlocked()) for (const r in C.rites.list) if (IG.Rites.available(r) && !IG.Rites.active(r) && affordableWith(IG.Rites.cost(r), res, 0.3)) IG.Rites.invoke(r, true);
-  if (IG.Grid.unlocked() && !IG.Agents.occupant('grid')) IG.Agents.actions.grid({ level: 1 });
+  if (IG.Grid.unlocked() && !IG.Agents.occupants('grid').length) IG.Agents.actions.grid({ level: 1 });
   if (IG.Compute.unlocked() && IG.Compute.totalShare() < 0.99) IG.Compute.balance();
   if (IG.Mega.unlocked() && !s.run.mega.active) { const m = IG.Mega.cheapestAvailable(); if (m) IG.Mega.start(m); }
   if (IG.War && IG.War.active()) IG.War.autoAllocate();

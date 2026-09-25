@@ -5,7 +5,7 @@
 
   const LABELS = {
     global: 'All production', click: 'Forage gains', clickRate: 'Forage grants seconds of production',
-    agentSpeed: 'Agent speed', agentCost: 'Agent costs', agentPower: 'Agent bulk actions', offlineCap: 'Offline cap (hours)',
+    agentSpeed: 'Agent speed', agentCost: 'Agent costs', agentPower: 'Agent bulk actions', crewSize: 'Agents per area', offlineCap: 'Offline cap (hours)',
     ppMult: 'Prestige points gained', synergyMult: 'Synergy strength', researchCost: 'Research costs',
     eraReq: 'Era milestone resource requirements', tradeMult: 'Trade route power', tradeCost: 'Trade route costs',
     riteMult: 'Rite power', riteDuration: 'Rite duration', riteCost: 'Rite costs', gridDrain: 'Grid upkeep',
@@ -16,7 +16,7 @@
     yardRate: 'Shipyard & barracks output', frontSpeed: 'Front advance speed', enemyStrength: 'Enemy strength',
     captureMult: 'Worlds captured per victory', lossMult: 'Worlds lost per defeat',
   };
-  const ADD_PCT = { colonyYield: false, clickRate: false, offlineCap: false, agentPower: false, worldBonus: true, launchBatch: false };
+  const ADD_PCT = { colonyYield: false, clickRate: false, offlineCap: false, agentPower: false, crewSize: false, worldBonus: true, launchBatch: false };
 
   function targetName(e) {
     const C = IG.CONFIG;

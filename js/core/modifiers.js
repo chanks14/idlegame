@@ -23,7 +23,7 @@
 
   // Plain-number modifiers: [key, default]
   const NUMERIC_KEYS = {
-    clickRate: 0, agentSpeed: 1, agentCost: 1, agentPower: 0, offlineCap: 0, ppMult: 1, synergyMult: 1,
+    clickRate: 0, agentSpeed: 1, agentCost: 1, agentPower: 0, crewSize: 0, offlineCap: 0, ppMult: 1, synergyMult: 1,
     researchCost: 1, eraReq: 1,
     tradeMult: 1, tradeCost: 1, riteMult: 1, riteDuration: 1, riteCost: 1, gridDrain: 1, gridMult: 1,
     computeMult: 1, megaCost: 1,
