@@ -19,6 +19,7 @@
       era: 0,
       resources: resourceMap(),
       produced: resourceMap(), // gross production this run (legacy / stats)
+      eraBase: resourceMap(),  // `produced` when the current era began (cumulative era milestones)
       gens,
       research: {},            // id -> level
       clicks: 0,
@@ -76,6 +77,7 @@
         popups: true,
         particles: true,
         confirmPrestige: true,
+        agentsPaused: false,
       },
       perm: newPerm(),
       run: newRun(),

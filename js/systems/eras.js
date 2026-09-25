@@ -1,5 +1,7 @@
 'use strict';
 // Era progression: milestone conditions and advancing.
+// Resource conditions are cumulative: they count gross production since the current era began
+// (run.produced − run.eraBase), so spending — by the player or by agents — never sets progress back.
 (function () {
   const IG = globalThis.IG || (globalThis.IG = {});
   const D = IG.D;
@@ -9,7 +11,7 @@
   function condLabel(c) {
     const C = IG.CONFIG;
     switch (c.type) {
-      case 'res': return 'Hold ' + IG.fmt(req(c)) + ' ' + C.resources[c.res].name;
+      case 'res': return 'Gather ' + IG.fmt(gathered(c.res).min(req(c))) + ' / ' + IG.fmt(req(c)) + ' ' + C.resources[c.res].name;
       case 'research': return 'Research ' + C.research[c.id].name;
       case 'gen': return 'Own ' + c.count + ' ' + IG.Prod.view(c.gen).name;
       case 'mega': return 'Complete the ' + C.megaprojects.list[c.id].name;
@@ -25,6 +27,17 @@
     return D(c.amount).mul(IG.Mods.get().eraReq);
   }
 
+  // Gross amount of a resource produced since the current era began.
+  function gathered(r) {
+    const run = IG.state.run;
+    const base = run.eraBase[r] || D(0);
+    return Decimal.max(0, run.produced[r].sub(base));
+  }
+
+  function snapshotBase(run) {
+    for (const r in run.produced) run.eraBase[r] = D(run.produced[r]);
+  }
+
   // Returns [{label, frac (0..1), done}]
   function progress(i) {
     const e = era(i);
@@ -35,7 +48,7 @@
       switch (c.type) {
         case 'res': {
           const need = req(c);
-          const have = s.run.resources[c.res];
+          const have = gathered(c.res);
           frac = have.gte(need) ? 1 : Math.max(0, IG.util.log10(have.add(1)) / IG.util.log10(need.add(1)));
           break;
         }
@@ -62,6 +75,7 @@
     const s = IG.state, C = IG.CONFIG;
     s.run.era = next;
     s.run.eraTimes[next] = s.run.time;
+    snapshotBase(s.run);
     const best = s.perm.stats.bestEraTimes;
     if (best[next] === undefined || best[next] === null || s.run.time < best[next]) best[next] = s.run.time;
     if (next > s.perm.highestEra) s.perm.highestEra = next;
@@ -78,6 +92,6 @@
     return true;
   }
 
-  const Eras = { era, progress, canAdvance, advance, enter, hasNext, condLabel, onEnter: [] };
+  const Eras = { era, progress, canAdvance, advance, enter, hasNext, condLabel, gathered, snapshotBase, onEnter: [] };
   IG.Eras = Eras;
 })();

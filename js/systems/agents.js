@@ -224,7 +224,19 @@
     },
   };
 
+  // Pause switch for every agent at once (a player setting, so it survives prestige). Paused agents keep their
+  // posts but their timers stop, so resuming never triggers a burst of stored-up actions.
+  function paused() { return !!IG.state.settings.agentsPaused; }
+  function setPaused(on) {
+    on = !!on;
+    if (paused() === on) return;
+    IG.state.settings.agentsPaused = on;
+    IG.Log.add(on ? 'Your agents stand down and await your word.' : 'Your agents return to their work.', 'system');
+    IG.Bus.emit('agentsPaused', on);
+  }
+
   function tick(dt) {
+    if (paused()) return;
     const max = A().maxActionsPerTick;
     for (const a of list()) {
       if (!a.area || !areaAvailable(a.area)) continue;
@@ -244,7 +256,7 @@
 
   const Agents = { list, typeUnlocked, countOfType, recruitCost, upgradeCost, areaAvailable, crewCap, occupants, hasRoom,
     eligibleAreas, freeAreaFor, canRecruit, assign, recruit, upgrade, promoteTargets, promoteCost, promoteLevel, canPromote,
-    promote, autoStaff, interval, bulk, buyInEra, actions, extraActions: {},
+    promote, autoStaff, paused, setPaused, interval, bulk, buyInEra, actions, extraActions: {},
     maxLevel() { return list().reduce((m, a) => Math.max(m, a.level), 0); } };
   IG.Agents = Agents;
 })();

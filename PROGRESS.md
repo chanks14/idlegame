@@ -101,7 +101,7 @@
 
 ### Phase 7 — Balancing and bug fixes
 - `tools/sim.js` grew into a tuning harness: `--prestige auto|none`, `--cps`, `--manage` (seconds between
-  decisions), `--reserve`, `--stall`, `--mult` (flat production multiplier), `--set path=value` (config
+  decisions), `--stall`, `--mult` (flat production multiplier), `--set path=value` (config
   override, repeatable), `--warlog`, `--snapshot file` (state at first contact), `--from file`.
 - `tools/uitest.js`: Playwright smoke test through every era and tab (tooltips, buttons, prestige,
   export/import, offline). Found and fixed a Research-tab crash in eras 7–8 (describe.js config paths).
@@ -159,6 +159,17 @@
   MODERNIZED tag (tooltip lists every line), generator tooltips show the full lineage and bonus. Upgrade names,
   research effect text and `gen` milestone labels use the current form's name.
 
+### Cumulative era milestones + agent pause
+- Resource milestones ("Gather X") now count gross production since the current era began
+  (`run.produced − run.eraBase`, base snapshotted in `IG.Eras.enter`), not the amount held. Spending — by the player
+  or by agents — never sets era progress back. Sidebar rows show `gathered / needed` and a tooltip explaining it.
+- SAVE_VERSION 3: `run.eraBase` added; the v2 → v3 migration sets the base so current progress equals what was held.
+- Pause all agents: `IG.Agents.setPaused()` (stored in `settings.agentsPaused`, so it survives prestige). Paused
+  agents keep their posts and their timers stop (no burst of stored actions on resume); also paused offline.
+  Header button (shown once any agent serves), "Pause all / Resume all" in the Agents tab with a paused banner,
+  hotkey P.
+- Sim: removed the milestone reservation strategy (`--reserve`), no longer meaningful.
+
 ## Known issues
 - Pacing numbers come from an idealized simulated player; expect a human to be ~1.2–1.6× slower.
 - The endless war is designed to stall eventually (enemy escalation is exponential in time); the intended
@@ -187,6 +198,12 @@
   run 3, Atomic + Spacefaring run 5, Interstellar run 6 at 2 h 43 m, War run 7 at 3 h 56 m — ~13 % faster to
   Interstellar than the Phase 7 baseline (3 h 07 m), ~6 % to War. Each change alone was ~5 %. If that is too fast,
   lower `modernize.multPerTier` (1.25) first.
+- Cumulative era milestones (same build, before → after): active Classical 24 m → 21.5 m, Atomic run 5 → run 4,
+  Interstellar 2 h 43 m → 1 h 56 m (run 6), War 3 h 56 m → 2 h 56 m (run 7); check-in Classical 38.5 m → 36 m,
+  Interstellar run 7 at 5 h 16 m → run 6 at 4 h 04 m, War run 8 at 6 h 36 m → run 7 at 5 h 22 m (~25 % faster).
+  The gain comes from spending freely instead of saving for the milestone: multiplying every resource milestone
+  amount ×2, ×3 or ×5 changed the active profile by < 3 %, so resource amounts no longer gate pacing — research
+  milestone techs do. To slow it back down, use research costs / power tree levers, not milestone amounts.
 - War arc (from a first-contact snapshot): fast conquest for ~20 min, contested fronts for ~2–2.5 h
   (~75–140 fronts won, worlds 60k → ~4M), then escalation wins and the player prestiges.
 - Levers: era milestone amounts (per-era length), bootstrap generator cost growth, power tree effect/cost

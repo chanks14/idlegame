@@ -58,6 +58,7 @@
     if (k === 's' || k === 'S') { if (IG.Save.save()) IG.UI.toast('Game saved.'); return; }
     if (k === 'a' || k === 'A') { IG.Eras.advance(); return; }
     if (k === 'r' || k === 'R') { const id = IG.Research.cheapestAffordable(); if (id) IG.Research.buy(id); return; }
+    if (k === 'p' || k === 'P') { IG.Agents.setPaused(!IG.Agents.paused()); IG.UI.toast(IG.Agents.paused() ? 'Agents paused' : 'Agents resumed'); return; }
     if (k === 'm' || k === 'M') { IG.state.settings.mute = !IG.state.settings.mute; IG.Bus.emit('settings', 'mute'); IG.UI.toast(IG.state.settings.mute ? 'Muted' : 'Sound on'); return; }
     if (k >= '1' && k <= '9') {
       const visible = IG.UI.tabs.filter((t) => t.isUnlocked());

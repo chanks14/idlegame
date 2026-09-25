@@ -9,6 +9,7 @@
   let rosterRefs = [];
   let areaRefs = [];
   let promoteRefs = [];   // rows of the open promotion dialog
+  let pauseBtn = null, pausedNote = null;
 
   function anyUnlocked() {
     for (const t in C().agents.types) if (IG.Agents.typeUnlocked(t)) return true;
@@ -115,8 +116,12 @@
 
     // roster
     const ros = el('section', { class: 'era-section' });
+    pauseBtn = el('button', { class: 'btn small agents-toggle', title: 'Pause / resume all agents (P)',
+      on: { click: () => IG.Agents.setPaused(!IG.Agents.paused()) } });
     ros.appendChild(el('div', { class: 'era-head' }, [IG.icons.node('agents'), el('span', { text: 'Your agents' }),
-      el('span', { class: 'muted small', text: s.run.agents.length + ' serving' })]));
+      el('span', { class: 'muted small', text: s.run.agents.length + ' serving' }), pauseBtn]));
+    pausedNote = el('div', { class: 'paused-note', text: 'All agents are paused — they hold their posts but take no actions. Nothing they would buy is spent.' });
+    ros.appendChild(pausedNote);
     if (!s.run.agents.length) ros.appendChild(el('div', { class: 'muted', text: 'No mortal serves you yet.' }));
     const list = el('div', { class: 'agent-list' });
     for (const a of s.run.agents) {
@@ -172,6 +177,12 @@
   }
 
   function update() {
+    const paused = IG.Agents.paused();
+    if (pauseBtn) {
+      toggle(pauseBtn, 'paused', paused);
+      setText(pauseBtn, paused ? '▶ Resume all' : '❚❚ Pause all');
+    }
+    if (pausedNote) toggle(pausedNote, 'hidden', !paused);
     for (const r of recruitRefs) {
       const c = IG.Agents.recruitCost(r.t);
       const free = freePosts(r.t);
@@ -182,7 +193,7 @@
     }
     for (const r of rosterRefs) {
       setText(r.lvl, 'Lv ' + r.a.level);
-      setText(r.info, r.a.area ? C().agents.areas[r.a.area].name + ' · every ' + IG.Agents.interval(r.a).toFixed(1) + 's × ' + IG.Agents.bulk(r.a) : 'Idle');
+      setText(r.info, r.a.area ? C().agents.areas[r.a.area].name + ' · ' + (paused ? 'paused' : 'every ' + IG.Agents.interval(r.a).toFixed(1) + 's × ' + IG.Agents.bulk(r.a)) : 'Idle');
       const c = IG.Agents.upgradeCost(r.a);
       setHTML(r.up, 'Upgrade ' + IG.dom.costHTML(c));
       toggle(r.up, 'disabled', !IG.Prod.canAfford(c));

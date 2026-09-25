@@ -4,7 +4,7 @@
   const IG = globalThis.IG || (globalThis.IG = {});
 
   // Bump whenever the save format changes, and add a migration from the previous version below.
-  const SAVE_VERSION = 2;
+  const SAVE_VERSION = 3;
   const KEY = 'undyingHand.save';
 
   // migrations[v] upgrades a raw save object from version v to v+1.
@@ -13,6 +13,19 @@
     // string form, so no data change is needed); war state gained `scale`, expansion gained `captured`.
     1: (raw) => {
       if (raw.run && raw.run.exp && raw.run.exp.captured === undefined) raw.run.exp.captured = 0;
+      return raw;
+    },
+    // v2 → v3: era resource milestones became cumulative (produced since the era began, run.eraBase).
+    // Pick the base so current progress equals what was held, so no one loses progress on upgrade.
+    2: (raw) => {
+      const run = raw.run;
+      if (run && run.produced && !run.eraBase) {
+        run.eraBase = {};
+        for (const r in run.produced) {
+          const prod = IG.D(run.produced[r] || 0), held = IG.D((run.resources && run.resources[r]) || 0);
+          run.eraBase[r] = Decimal.max(0, prod.sub(held));
+        }
+      }
       return raw;
     },
   };
@@ -62,6 +75,7 @@
     for (const r in IG.CONFIG.resources) {
       if (!(run.resources[r] instanceof Decimal)) run.resources[r] = IG.D(run.resources[r] || 0);
       if (!(run.produced[r] instanceof Decimal)) run.produced[r] = IG.D(run.produced[r] || 0);
+      if (!(run.eraBase[r] instanceof Decimal)) run.eraBase[r] = IG.D(run.eraBase[r] || 0);
       const life = merged.perm.stats.lifetime;
       if (!(life[r] instanceof Decimal)) life[r] = IG.D(life[r] || 0);
     }

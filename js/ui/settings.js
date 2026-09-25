@@ -11,6 +11,7 @@
     ['A', 'Advance to the next era (when the milestone is met)'],
     ['R', 'Research the cheapest available tech'],
     ['S', 'Save now'],
+    ['P', 'Pause / resume all agents'],
     ['M', 'Mute / unmute sound'],
     ['Esc', 'Close dialogs'],
     ['type "aeon"', 'Toggle developer mode (then ` opens the dev panel)'],

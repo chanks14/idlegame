@@ -6,7 +6,6 @@
 //     --hours 8          simulated play time            --dt 3          seconds per simulation step
 //     --cps 4            forage clicks/s (early eras)    --manage 2      seconds between strategy decisions
 //     --prestige auto    'auto' | 'none'                 --stall 20      minutes without a new era → prestige
-//     --reserve 180      save for the milestone once it is this many seconds away
 //     --mult 1           flat production multiplier (models prestige power when testing era lengths)
 //     --set a.b.0=v      override any config value (repeatable), e.g. --set eras.2.milestone.0.amount=1e6
 //     --runs 30          stop after this many prestiges  --verbose       resource snapshots every 10 min
@@ -15,8 +14,8 @@
 //
 // Strategy (an attentive active player):
 //  - forages `cps` times per second in the Stone/Bronze ages, half that until the Industrial Age
-//  - buys research, generators, upgrades, trade routes, rites, grid, compute, megaprojects, agents greedily,
-//    reserving resources for the current era milestone once that milestone is close
+//  - buys research, generators, upgrades, trade routes, rites, grid, compute, megaprojects, agents greedily
+//    (era milestones count resources gathered since the era began, so spending never delays them)
 //  - builds colony arks only while there is space; auto-allocates the fleet; buys war industry
 //  - advances eras immediately; prestiges when the gain ≥ 2× lifetime points + 10, or when stalled
 const { load } = require('./headless');
@@ -37,7 +36,6 @@ const PRESTIGE = arg('prestige', 'auto');
 const STALL = parseFloat(arg('stall', 20)) * 60;
 const MULT = parseFloat(arg('mult', 1));            // flat production multiplier (models prestige power)
 const MANAGE_EVERY = parseFloat(arg('manage', 2));  // seconds between strategy decisions
-const RESERVE = parseFloat(arg('reserve', 180));
 const WARLOG = !!arg('warlog', false);
 const SNAP_OUT = arg('snapshot', '');   // write the state at first contact to this file
 const SNAP_IN = arg('from', '');        // start from a saved state file
@@ -65,22 +63,6 @@ const C = IG.CONFIG;
 const D = IG.D;
 
 // ------------------------------------------------------------------ strategy helpers
-function reserved() {
-  // resources needed for the milestone that we are close to affording → only spend small fractions of them
-  const out = {};
-  const e = C.eras[IG.state.run.era];
-  if (!e.milestone) return out;
-  for (const c of e.milestone) {
-    if (c.type !== 'res') continue;
-    const need = D(c.amount).mul(IG.Mods.get().eraReq);
-    const have = IG.state.run.resources[c.res];
-    if (have.gte(need)) { out[c.res] = 1; continue; }
-    const rate = IG.Prod.cache.rates[c.res] || D(0);
-    if (rate.gt(0) && need.sub(have).div(rate).lt(RESERVE)) out[c.res] = 1;
-  }
-  return out;
-}
-
 function affordableWith(costs, res, frac) {
   const r = IG.state.run.resources;
   for (const k in costs) {
@@ -179,7 +161,7 @@ while (t < end) {
   const clicks = s.run.era <= 1 ? CPS : s.run.era <= 3 ? CPS / 2 : 0;
   if (clicks > 0) IG.Prod.forage(clicks * DT, true);
   manageAcc += DT;
-  if (manageAcc >= MANAGE_EVERY) { manageAcc = 0; manage(reserved()); }
+  if (manageAcc >= MANAGE_EVERY) { manageAcc = 0; manage({}); }
   if (IG.Eras.canAdvance()) {
     IG.Eras.advance();
     cur.eras[s.run.era] = s.run.time;

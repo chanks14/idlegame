@@ -384,6 +384,11 @@ b.gold, .gold { color: var(--gold); }
 .icon-btn { padding: 3px 7px; display: inline-flex; align-items: center; }
 .icon-btn .ic { width: 16px; height: 16px; }
 .muted-btn { opacity: .45; text-decoration: line-through; }
+.agents-toggle { white-space: nowrap; }
+.agents-toggle.paused { color: var(--gold); border-color: var(--gold); box-shadow: 0 0 10px rgba(255,211,106,.25); }
+.era-head .agents-toggle { margin-left: auto; font-family: inherit; font-size: 12px; }
+.paused-note { margin: 0 0 8px; padding: 6px 10px; border: 1px solid var(--gold); border-radius: 6px; color: var(--gold);
+  background: rgba(255, 211, 106, .07); font-size: 12px; }
 .gen-card.flash { animation: cardFlash .45s ease-out; }
 @keyframes cardFlash { 0% { box-shadow: 0 0 0 0 var(--accent); border-color: var(--accent); } 100% { box-shadow: 0 0 18px 0 transparent; } }
 .res-chip .ic, .res-row .ic { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--rc) 60%, transparent)); }

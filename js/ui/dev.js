@@ -60,7 +60,11 @@
     const e = IG.CONFIG.eras[IG.state.run.era];
     if (!e.milestone) return;
     for (const c of e.milestone) {
-      if (c.type === 'res') { const need = IG.D(c.amount).mul(IG.Mods.get().eraReq); if (IG.state.run.resources[c.res].lt(need)) IG.state.run.resources[c.res] = need; }
+      if (c.type === 'res') {
+        const run = IG.state.run, need = IG.D(c.amount).mul(IG.Mods.get().eraReq);
+        if (run.resources[c.res].lt(need)) run.resources[c.res] = need;
+        if (IG.Eras.gathered(c.res).lt(need)) run.eraBase[c.res] = run.produced[c.res].sub(need);
+      }
       if (c.type === 'research') { IG.state.run.research[c.id] = 1; IG.Mods.dirty = true; }
       if (c.type === 'gen') { const g = IG.state.run.gens[c.gen]; if (g.n < c.count) g.n = c.count; }
       if (c.type === 'mega' && IG.Mega) IG.Mega.devComplete(c.id);

@@ -83,6 +83,10 @@
   const headerExtras = [];
 
   function buildHeader() {
+    const paused = IG.Agents.paused();
+    toggle(refs.agentsBtn, 'hidden', !IG.state.run.agents.length);
+    toggle(refs.agentsBtn, 'paused', paused);
+    setText(refs.agentsBtn, paused ? '▶ Resume agents' : '❚❚ Pause agents');
     const list = headerResources();
     const extras = headerExtras.filter((x) => x.show());
     const key = list.join(',') + '|' + extras.map((x) => x.id).join(',');
@@ -161,7 +165,8 @@
           const bar = el('div', { class: 'bar-fill' });
           const lbl = el('span', { class: 'ms-label' });
           const rc = p.res && IG.CONFIG.resources[p.res] ? IG.CONFIG.resources[p.res].color : null;
-          const row = el('div', { class: 'ms-row', style: rc ? { '--rc': rc } : {} }, [lbl, el('div', { class: 'bar' }, [bar])]);
+          const tip = p.res ? 'Counts all ' + IG.CONFIG.resources[p.res].name + ' produced since this age began. Spending it (yours or your agents\') never sets this back.' : undefined;
+          const row = el('div', { class: 'ms-row', style: rc ? { '--rc': rc } : {}, tip }, [lbl, el('div', { class: 'bar' }, [bar])]);
           refs.msList.appendChild(row);
           return { row, bar, lbl };
         });
@@ -296,6 +301,8 @@
     mute.addEventListener('click', () => { IG.state.settings.mute = !IG.state.settings.mute; IG.Bus.emit('settings', 'mute'); drawMute(); });
     IG.Bus.on('settings', drawMute);
     drawMute();
+    refs.agentsBtn = document.getElementById('btn-agents');
+    refs.agentsBtn.addEventListener('click', () => IG.Agents.setPaused(!IG.Agents.paused()));
     IG.Bus.on('log', onLog);
     IG.Bus.on('structure', () => { dirty = true; });
     IG.Bus.on('era', () => { dirty = true; eraKey = ''; tabbarKey = ''; });
